@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Louise's Florist · Hoddesdon — Beautiful flowers for every occasion</title>
+<link rel="icon" type="image/png" href="images/louises-florist-logo-badge.png">
+<link rel="apple-touch-icon" href="images/louises-florist-logo-badge.png">
+<meta name="description" content="Louise's Florist, 53 High Street, Hoddesdon. A family florist with over 40 years' experience — weddings, funerals, occasions & gifts, with local delivery.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --rose:#b56576; --rose-dk:#8f4a5b; --sage:#7c8a5a; --sage-dk:#5f6b45;
+    --cream:#faf5f0; --cream-2:#f3ebe3; --ink:#39312f; --ink-soft:#6a5f5b; --line:#e7dcd2;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:'Jost',sans-serif;color:var(--ink);background:var(--cream);line-height:1.65;font-weight:300}
+  h1,h2,h3{font-family:'Cormorant Garamond',serif;font-weight:600;line-height:1.1;color:var(--ink)}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:13px 26px;border-radius:40px;font-weight:500;font-size:14px;letter-spacing:.02em;cursor:pointer;transition:.2s;border:1px solid transparent}
+  .btn-primary{background:var(--rose);color:#fff}
+  .btn-primary:hover{background:var(--rose-dk)}
+  .btn-ghost{background:transparent;color:var(--ink);border-color:var(--ink)}
+  .btn-ghost:hover{background:var(--ink);color:#fff}
+  .eyebrow{font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:var(--rose);font-weight:500}
+
+  /* Nav */
+  nav{position:sticky;top:0;z-index:50;background:rgba(250,245,240,.9);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .nav-in{display:flex;align-items:center;justify-content:space-between;padding:10px 24px;max-width:1120px;margin:0 auto}
+  .brand-wrap{display:flex;align-items:center;gap:13px;text-decoration:none}
+  .brand-badge{height:70px;width:auto;display:block}
+  .brand-txt{display:flex;flex-direction:column;line-height:1.02}
+  .brand-name{font-family:'Cormorant Garamond',serif;font-size:31px;font-weight:700;color:var(--ink);letter-spacing:.005em}
+  .brand-name .r{color:var(--rose)}
+  .brand-sub{font-family:'Jost',sans-serif;font-size:9.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--ink-soft);margin-top:4px;font-weight:500}
+  @media(max-width:520px){.brand-badge{height:54px}.brand-name{font-size:23px}.brand-sub{font-size:8px}}
+  .nav-links{display:flex;gap:30px;align-items:center;font-size:14px}
+  .nav-links a{color:var(--ink-soft);transition:.15s}
+  .nav-links a:hover{color:var(--rose)}
+  @media(max-width:760px){.nav-links a:not(.btn){display:none}}
+
+  /* Hero */
+  .hero{position:relative;min-height:82vh;display:flex;align-items:center;
+    background:linear-gradient(120deg,#f3d9d3 0%,#f6ebe2 45%,#e3e7d0 100%);overflow:hidden}
+  .hero::before,.hero::after{content:"";position:absolute;border-radius:50%;filter:blur(2px);opacity:.5}
+  .hero::before{width:520px;height:520px;right:-120px;top:-120px;background:radial-gradient(circle,#e59aa6,transparent 65%)}
+  .hero::after{width:460px;height:460px;left:-140px;bottom:-160px;background:radial-gradient(circle,#aebd7f,transparent 65%)}
+  .hero-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}
+  .hero-scrim{position:absolute;inset:0;z-index:1;
+    background:linear-gradient(100deg,rgba(248,242,236,.94) 0%,rgba(248,242,236,.80) 42%,rgba(248,242,236,.32) 78%,rgba(248,242,236,.12) 100%)}
+  .hero-in{position:relative;z-index:2;max-width:720px}
+  .hero h1{font-size:clamp(46px,7vw,88px);margin:14px 0 8px}
+  .hero .lede{font-size:20px;color:#453c38;max-width:520px;margin-bottom:30px;font-weight:400}
+  .hero .cta{display:flex;gap:14px;flex-wrap:wrap}
+
+  /* Trust bar */
+  .trust{background:var(--ink);color:#f3ebe3}
+  .trust-in{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;padding:26px 24px;max-width:1120px;margin:0 auto;text-align:center}
+  .trust b{font-family:'Cormorant Garamond',serif;font-size:26px;display:block;color:#fff}
+  .trust small{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#c9beb6}
+  @media(max-width:760px){.trust-in{grid-template-columns:repeat(2,1fr);gap:18px}}
+
+  section{padding:84px 0}
+  .sec-head{text-align:center;max-width:640px;margin:0 auto 48px}
+  .sec-head h2{font-size:clamp(34px,5vw,52px);margin:10px 0 12px}
+  .sec-head p{color:var(--ink-soft)}
+
+  /* Services */
+  .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:22px}
+  @media(max-width:900px){.cards{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:520px){.cards{grid-template-columns:1fr}}
+  .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:30px 24px;transition:.2s}
+  .card:hover{transform:translateY(-4px);box-shadow:0 18px 40px rgba(57,49,47,.08)}
+  .card .ic{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:16px;background:var(--cream-2)}
+  .card h3{font-size:24px;margin-bottom:8px}
+  .card p{font-size:14px;color:var(--ink-soft)}
+
+  /* Gallery */
+  .gallery{background:var(--cream-2)}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media(max-width:760px){.grid{grid-template-columns:repeat(2,1fr)}}
+  .tile{aspect-ratio:1/1;border-radius:14px;display:flex;align-items:flex-end;padding:16px;color:#fff;font-family:'Cormorant Garamond',serif;font-size:20px;position:relative;overflow:hidden}
+  .tile img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
+  .tile::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 42%,rgba(0,0,0,.55));z-index:2}
+  .tile span{position:relative;z-index:3;text-shadow:0 1px 8px rgba(0,0,0,.45)}
+  .t1{background:linear-gradient(160deg,#c96a7a,#8f4a5b)}
+  .t2{background:linear-gradient(160deg,#93a05f,#5f6b45)}
+  .t3{background:linear-gradient(160deg,#d8a04f,#a9752f)}
+  .t4{background:linear-gradient(160deg,#b07aa6,#7a4f72)}
+  .t5{background:linear-gradient(160deg,#7aa6b0,#4f727a)}
+  .t6{background:linear-gradient(160deg,#c98a94,#8f4a5b)}
+  .gallery .note{text-align:center;margin-top:22px;font-size:13px;color:var(--ink-soft)}
+
+  /* Contact */
+  .contact-in{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start}
+  @media(max-width:820px){.contact-in{grid-template-columns:1fr;gap:28px}}
+  .info-row{display:flex;gap:14px;margin-bottom:18px;align-items:flex-start}
+  .info-row .ic{font-size:20px;width:26px;flex-shrink:0}
+  .info-row b{font-family:'Jost',sans-serif;font-weight:500;display:block}
+  .info-row span{color:var(--ink-soft);font-size:14px}
+  .map{width:100%;height:340px;border:0;border-radius:16px;filter:saturate(.9)}
+  .hours{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin-top:8px}
+  .hours div{display:flex;justify-content:space-between;font-size:14px;padding:5px 0;color:var(--ink-soft)}
+  .hours div b{color:var(--ink);font-weight:500}
+
+  /* Enquiry / order form */
+  .order{background:linear-gradient(160deg,#f6ebe2,#e8e6d5)}
+  .order-card{max-width:680px;margin:0 auto;background:#fff;border:1px solid var(--line);border-radius:22px;padding:44px 44px 40px;box-shadow:0 24px 60px rgba(57,49,47,.08)}
+  .order-intro{text-align:center;margin-bottom:28px}
+  .order-intro h2{font-size:clamp(30px,4.5vw,44px);margin:8px 0 10px}
+  .order-intro p{color:var(--ink-soft);font-size:15px}
+  .order-form label{display:block;font-size:12px;letter-spacing:.02em;color:var(--ink-soft);margin-bottom:14px;font-weight:400}
+  .order-form input,.order-form select,.order-form textarea{
+    width:100%;margin-top:6px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;
+    font-family:'Jost',sans-serif;font-size:14px;color:var(--ink);background:var(--cream);transition:border-color .15s}
+  .order-form input:focus,.order-form select:focus,.order-form textarea:focus{outline:none;border-color:var(--rose)}
+  .order-form textarea{resize:vertical}
+  .frow{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:520px){.frow{grid-template-columns:1fr}}
+  .order-form .btn{width:100%;justify-content:center;margin-top:6px;font-size:15px;padding:15px}
+  .order-ok{margin-top:8px;padding:16px;border-radius:12px;background:rgba(124,138,90,.12);border:1px solid var(--sage);color:var(--sage-dk);text-align:center;font-size:14px}
+
+  footer{background:var(--ink);color:#c9beb6;text-align:center;padding:40px 24px;font-size:13px}
+  footer .brand{color:#fff;font-size:22px}
+  footer a{color:#e59aa6}
+  .demo-flag{background:var(--sage-dk);color:#fff;text-align:center;font-size:12px;letter-spacing:.08em;padding:8px}
+</style>
+</head>
+<body>
+
+<div class="demo-flag">✿ DEMO PREVIEW — sample site for Louise's Florist · built by [your agency]</div>
+
+<nav>
+  <div class="nav-in">
+    <a href="#" class="brand-wrap" aria-label="Louise's Florist">
+      <img class="brand-badge" src="images/louises-florist-logo-badge.png" alt="Louise's Florist" onerror="this.remove()">
+      <span class="brand-txt">
+        <span class="brand-name">Louise's <span class="r">Florist</span></span>
+        <span class="brand-sub">Fresh Flowers &amp; Gifts</span>
+      </span>
+    </a>
+    <div class="nav-links">
+      <a href="#services">Flowers</a>
+      <a href="#gallery">Gallery</a>
+      <a href="#order">Order</a>
+      <a href="#contact">Visit us</a>
+      <a class="btn btn-primary" href="tel:01992479794">📞 01992 479794</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <img class="hero-bg" src="images/hero.jpg" alt="" onerror="if(!this.dataset.f){this.dataset.f=1;this.src='https://loremflickr.com/1600/900/florist,flowers?lock=30'}else{this.remove()}">
+  <div class="hero-scrim"></div>
+  <div class="wrap hero-in">
+    <div class="eyebrow">Hoddesdon · Est. family florist</div>
+    <h1>Beautiful flowers,<br>lovingly made.</h1>
+    <p class="lede">Fresh, hand-tied arrangements for every occasion — from weddings and celebrations to funeral tributes — crafted by Louise with over 40 years' experience, right in the heart of Hoddesdon.</p>
+    <div class="cta">
+      <a class="btn btn-primary" href="#order">Order flowers</a>
+      <a class="btn btn-ghost" href="tel:01992479794">📞 01992 479794</a>
+    </div>
+  </div>
+</header>
+
+<div class="trust">
+  <div class="trust-in">
+    <div><b>40+</b><small>Years' experience</small></div>
+    <div><b>Fresh</b><small>Daily hand-tied</small></div>
+    <div><b>Local</b><small>Delivery available</small></div>
+    <div><b>High St</b><small>Hoddesdon shop</small></div>
+  </div>
+</div>
+
+<section id="services">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">What we do</div>
+      <h2>Flowers for every moment</h2>
+      <p>Whatever the occasion, we'll create something beautiful. Pop in, call, or arrange delivery.</p>
+    </div>
+    <div class="cards">
+      <div class="card"><div class="ic">💍</div><h3>Weddings</h3><p>Bouquets, buttonholes, arches and venue flowers — planned with you for your perfect day.</p></div>
+      <div class="card"><div class="ic">🕊️</div><h3>Funerals &amp; Tributes</h3><p>Thoughtful, dignified tributes and sympathy flowers, arranged with care and delivered on time.</p></div>
+      <div class="card"><div class="ic">🎁</div><h3>Occasions &amp; Gifts</h3><p>Birthdays, anniversaries, new baby or "just because" — hand-tied bouquets to make someone smile.</p></div>
+      <div class="card"><div class="ic">🏢</div><h3>Corporate &amp; Events</h3><p>Regular displays, event flowers and seasonal arrangements for local businesses.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="gallery" class="gallery">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Our work</div>
+      <h2>A little inspiration</h2>
+      <p>A taste of what we create. Follow us on Facebook for our latest arrangements.</p>
+    </div>
+    <div class="grid">
+      <div class="tile t1"><img src="images/g1.jpg" alt="Hand-tied bouquets" onerror="if(!this.dataset.f){this.dataset.f=1;this.src='https://loremflickr.com/700/700/bouquet?lock=21'}else{this.remove()}"><span>Hand-tied bouquets</span></div>
+      <div class="tile t2"><img src="images/g2.jpg" alt="Seasonal blooms" onerror="if(!this.dataset.f){this.dataset.f=1;this.src='https://loremflickr.com/700/700/flowers,spring?lock=22'}else{this.remove()}"><span>Seasonal blooms</span></div>
+      <div class="tile t3"><img src="images/g3.jpg" alt="Bright &amp; cheerful" onerror="if(!this.dataset.f){this.dataset.f=1;this.src='https://loremflickr.com/700/700/flowers,colourful?lock=23'}else{this.remove()}"><span>Bright &amp; cheerful</span></div>
+      <div class="tile t4"><img src="images/g4.jpg" alt="Wedding flowers" onerror="if(!this.dataset.f){this.dataset.f=1;this.src='https://loremflickr.com/700/700/wedding,bouquet?lock=24'}else{this.remove()}"><span>Wedding flowers</span></div>
+      <div class="tile t5"><img src="images/g5.jpg" alt="Sympathy tributes" onerror="if(!this.dataset.f){this.dataset.f=1;this.src='https://loremflickr.com/700/700/lily,flowers?lock=25'}else{this.remove()}"><span>Sympathy tributes</span></div>
+      <div class="tile t6"><img src="images/g6.jpg" alt="Gift arrangements" onerror="if(!this.dataset.f){this.dataset.f=1;this.src='https://loremflickr.com/700/700/roses,bouquet?lock=26'}else{this.remove()}"><span>Gift arrangements</span></div>
+    </div>
+    <p class="note">✿ Showing flower stock photos for now. Drop Louise's real photos into the <code>images</code> folder as <code>g1.jpg … g6.jpg</code> and they'll replace these automatically.</p>
+  </div>
+</section>
+
+<section id="order" class="order">
+  <div class="wrap">
+    <div class="order-card">
+      <div class="order-intro">
+        <div class="eyebrow">Order &amp; enquiries</div>
+        <h2>Let's arrange something beautiful</h2>
+        <p>Tell us what you'd like and we'll get straight back to you. Need it today? Please call the shop on <a href="tel:01992479794" style="color:var(--rose)">01992 479794</a>.</p>
+      </div>
+      <form class="order-form" onsubmit="return sendEnquiry(event)">
+        <div class="frow">
+          <label>Your name<input name="name" required></label>
+          <label>Phone<input name="phone" type="tel" required></label>
+        </div>
+        <label>Email<input name="email" type="email" placeholder="optional"></label>
+        <div class="frow">
+          <label>Occasion
+            <select name="occasion">
+              <option>Bouquet / gift</option>
+              <option>Wedding</option>
+              <option>Funeral / sympathy</option>
+              <option>Corporate / event</option>
+              <option>Something else</option>
+            </select>
+          </label>
+          <label>Date needed<input name="date" type="date"></label>
+        </div>
+        <label>Details<textarea name="message" rows="4" placeholder="Colours, favourite flowers, budget, delivery address…"></textarea></label>
+        <button class="btn btn-primary" type="submit">Send enquiry</button>
+        <div class="order-ok" id="orderOk" style="display:none">✿ Thank you! Your enquiry has been sent — Louise will be in touch very soon.</div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Come and see us</div>
+      <h2>Visit the shop</h2>
+    </div>
+    <div class="contact-in">
+      <div>
+        <div class="info-row"><div class="ic">📍</div><div><b>Louise's Florist</b><span>53 High Street, Hoddesdon, EN11 8TQ</span></div></div>
+        <div class="info-row"><div class="ic">📞</div><div><b>Call to order</b><span><a href="tel:01992479794">01992 479794</a></span></div></div>
+        <div class="info-row"><div class="ic">✉️</div><div><b>Email</b><span>hello@louisesflorist.co.uk</span></div></div>
+        <div class="info-row"><div class="ic">💬</div><div><b>Facebook</b><span><a href="https://www.facebook.com/Louisesfloristhoddesdon/" target="_blank" rel="noopener">/Louisesfloristhoddesdon</a></span></div></div>
+        <div class="hours">
+          <div><b>Mon – Fri</b><span>9:00 – 5:00</span></div>
+          <div><b>Saturday</b><span>9:00 – 4:00</span></div>
+          <div><b>Sunday</b><span>Closed</span></div>
+          <p style="font-size:11px;color:var(--ink-soft);margin-top:8px">Opening hours shown are examples — we'll set Louise's real times.</p>
+        </div>
+      </div>
+      <iframe class="map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+        src="https://www.google.com/maps?q=53+High+Street+Hoddesdon+EN11+8TQ&output=embed"></iframe>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="brand">Louise's <span style="color:#e59aa6">Florist</span></div>
+  <p style="margin:10px 0">53 High Street, Hoddesdon, EN11 8TQ &nbsp;·&nbsp; <a href="tel:01992479794">01992 479794</a></p>
+  <p style="opacity:.6;font-size:12px">Demo site · not affiliated · sample created to show a website design.</p>
+</footer>
+
+<script>
+  // Demo handler — shows a success message. On the live site this emails the
+  // enquiry straight to Louise (and/or texts her).
+  function sendEnquiry(e){
+    e.preventDefault();
+    var form = e.target;
+    Array.prototype.forEach.call(form.children, function(c){ if (c.id !== 'orderOk') c.style.display = 'none'; });
+    document.getElementById('orderOk').style.display = 'block';
+    return false;
+  }
+</script>
+</body>
+</html>

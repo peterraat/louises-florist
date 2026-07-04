@@ -1,0 +1,25 @@
+LOUISE'S FLORIST — where the photos go
+======================================
+
+Save Louise's flower photos from her Facebook page into THIS folder,
+named exactly like this (JPG):
+
+  hero.jpg   -> big background photo behind the "Beautiful flowers" heading
+  g1.jpg     -> gallery: hand-tied bouquets
+  g2.jpg     -> gallery: seasonal blooms
+  g3.jpg     -> gallery: bright & cheerful
+  g4.jpg     -> gallery: wedding flowers
+  g5.jpg     -> gallery: sympathy tributes
+  g6.jpg     -> gallery: gift arrangements
+
+How to get them from Facebook (facebook.com/Louisesfloristhoddesdon):
+  - Open a photo, right-click it -> "Save image as..." -> save into this folder
+    with the right name above.
+  - Or take screenshots and crop them.
+
+Then just refresh the website (index.html) — the photos appear automatically.
+Until a photo is added, a tasteful colour tile shows in its place (never a
+broken image).
+
+Tip: roughly square photos work best for the gallery; a wide/landscape one
+looks best for hero.jpg.
