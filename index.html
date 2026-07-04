@@ -139,6 +139,46 @@
   .order-form .btn{width:100%;justify-content:center;margin-top:6px;font-size:15px;padding:15px}
   .order-ok{margin-top:8px;padding:16px;border-radius:12px;background:rgba(124,138,90,.12);border:1px solid var(--sage);color:var(--sage-dk);text-align:center;font-size:14px}
 
+  /* Gallery hover — slight zoom + gold frame */
+  .tile{border:2px solid transparent;transition:border-color .25s,box-shadow .25s}
+  .tile img{transition:transform .55s ease}
+  .tile:hover{border-color:var(--gold);box-shadow:0 14px 32px rgba(31,60,64,.22)}
+  .tile:hover img{transform:scale(1.08)}
+
+  /* Occasions */
+  .occ-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px}
+  @media(max-width:820px){.occ-grid{grid-template-columns:repeat(2,1fr)}}
+  .occ-card{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;background:#fff;border:1px solid var(--line);border-radius:16px;padding:28px 14px;transition:.2s;text-decoration:none;color:var(--ink)}
+  .occ-card:hover{transform:translateY(-4px);border-color:var(--gold);box-shadow:0 14px 30px rgba(31,60,64,.1)}
+  .occ-ic{font-size:32px;line-height:1}
+  .occ-card b{font-family:'Cormorant Garamond',serif;font-size:21px;font-weight:600}
+
+  /* Shop grid */
+  .shop{background:var(--cream-2)}
+  .shop-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+  @media(max-width:820px){.shop-grid{grid-template-columns:1fr}}
+  .shop-card{background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden;display:flex;flex-direction:column;transition:.2s}
+  .shop-card:hover{transform:translateY(-5px);box-shadow:0 20px 44px rgba(31,60,64,.12)}
+  .shop-img{aspect-ratio:4/3;position:relative;overflow:hidden;background:var(--cream-2)}
+  .shop-img img{width:100%;height:100%;object-fit:cover;transition:transform .55s}
+  .shop-card:hover .shop-img img{transform:scale(1.07)}
+  .shop-body{padding:20px 22px 24px;display:flex;flex-direction:column;flex:1}
+  .shop-body h3{font-size:24px;margin-bottom:4px}
+  .shop-body p{font-size:13px;color:var(--ink-soft);margin-bottom:14px;flex:1}
+  .shop-price{font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--rose-dk);font-weight:700;margin-bottom:16px}
+  .shop-price span{font-size:12px;color:var(--ink-soft);font-family:'Jost',sans-serif;font-weight:400}
+  .shop-card .btn{justify-content:center}
+  .shop-note{text-align:center;margin-top:26px;font-size:12px;color:var(--ink-soft)}
+
+  /* Floating WhatsApp + Call buttons */
+  .fabs{position:fixed;right:18px;bottom:18px;z-index:80;display:flex;flex-direction:column;gap:12px}
+  .fab{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 22px rgba(0,0,0,.28);transition:transform .15s}
+  .fab:hover{transform:scale(1.09)}
+  .fab-wa{background:#25d366}
+  .fab-call{background:var(--rose)}
+  .fab svg{width:28px;height:28px;fill:#fff}
+  @media(max-width:520px){.fab{width:52px;height:52px}.fab svg{width:26px;height:26px}}
+
   footer{background:var(--ink);color:#a6c3c5;text-align:center;padding:40px 24px;font-size:13px}
   footer .brand{color:#fff;font-size:26px;font-family:'Cormorant Garamond',serif;font-weight:700}
   footer a{color:var(--gold)}
@@ -161,6 +201,7 @@
     <div class="nav-links">
       <a href="#services">Flowers</a>
       <a href="#gallery">Gallery</a>
+      <a href="#shop">Shop</a>
       <a href="#reviews">Reviews</a>
       <a href="#order">Order</a>
       <a href="#contact">Visit us</a>
@@ -208,6 +249,23 @@
   </div>
 </section>
 
+<section id="occasions">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Any occasion</div>
+      <h2>Flowers for the moments that matter</h2>
+      <p>Pick an occasion and we'll help you choose something perfect.</p>
+    </div>
+    <div class="occ-grid">
+      <a class="occ-card" href="#order"><div class="occ-ic">💍</div><b>Weddings</b></a>
+      <a class="occ-card" href="#order"><div class="occ-ic">🕊️</div><b>Funerals</b></a>
+      <a class="occ-card" href="#order"><div class="occ-ic">❤️</div><b>Valentine's</b></a>
+      <a class="occ-card" href="#order"><div class="occ-ic">💐</div><b>Mother's Day</b></a>
+      <a class="occ-card" href="#order"><div class="occ-ic">🥂</div><b>Anniversaries</b></a>
+    </div>
+  </div>
+</section>
+
 <section id="gallery" class="gallery">
   <div class="wrap">
     <div class="sec-head">
@@ -223,7 +281,74 @@
       <div class="tile t5"><img src="images/g5.jpg" alt="Sympathy tributes" onerror="if(!this.dataset.f){this.dataset.f=1;this.src='https://loremflickr.com/700/700/lily,flowers?lock=25'}else{this.remove()}"><span>Sympathy tributes</span></div>
       <div class="tile t6"><img src="images/g6.jpg" alt="Gift arrangements" onerror="if(!this.dataset.f){this.dataset.f=1;this.src='https://loremflickr.com/700/700/roses,bouquet?lock=26'}else{this.remove()}"><span>Gift arrangements</span></div>
     </div>
-    <p class="note">✿ Showing flower stock photos for now. Drop Louise's real photos into the <code>images</code> folder as <code>g1.jpg … g6.jpg</code> and they'll replace these automatically.</p>
+    <p class="note">✿ Follow us on <a href="https://www.facebook.com/Louisesfloristhoddesdon/" target="_blank" rel="noopener" style="color:var(--rose)">Facebook</a> for our latest arrangements.</p>
+  </div>
+</section>
+
+<section id="shop" class="shop">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Order online</div>
+      <h2>Popular bouquets</h2>
+      <p>A few favourites to get you started — order below and we'll make it just right.</p>
+    </div>
+    <div class="shop-grid">
+      <div class="shop-card">
+        <div class="shop-img"><img src="images/g1.jpg" alt="Hand-tied bouquet" onerror="this.remove()"></div>
+        <div class="shop-body">
+          <h3>Hand-tied Bouquet</h3>
+          <p>A beautiful seasonal mix, hand-tied and gift-wrapped.</p>
+          <div class="shop-price">from £25 <span>· seasonal</span></div>
+          <a class="btn btn-primary" href="#order">Order</a>
+        </div>
+      </div>
+      <div class="shop-card">
+        <div class="shop-img"><img src="images/g4.jpg" alt="Luxury bouquet" onerror="this.remove()"></div>
+        <div class="shop-body">
+          <h3>Luxury Bouquet</h3>
+          <p>A generous, statement arrangement of premium blooms.</p>
+          <div class="shop-price">from £45 <span>· deluxe</span></div>
+          <a class="btn btn-primary" href="#order">Order</a>
+        </div>
+      </div>
+      <div class="shop-card">
+        <div class="shop-img"><img src="images/g6.jpg" alt="A dozen roses" onerror="this.remove()"></div>
+        <div class="shop-body">
+          <h3>A Dozen Roses</h3>
+          <p>Classic and romantic — a dozen fresh roses, beautifully tied.</p>
+          <div class="shop-price">from £35 <span>· roses</span></div>
+          <a class="btn btn-primary" href="#order">Order</a>
+        </div>
+      </div>
+      <div class="shop-card">
+        <div class="shop-img"><img src="images/g2.jpg" alt="Seasonal blooms" onerror="this.remove()"></div>
+        <div class="shop-body">
+          <h3>Seasonal Blooms</h3>
+          <p>Whatever's freshest that week, arranged with a keen eye.</p>
+          <div class="shop-price">from £30 <span>· seasonal</span></div>
+          <a class="btn btn-primary" href="#order">Order</a>
+        </div>
+      </div>
+      <div class="shop-card">
+        <div class="shop-img"><img src="images/g5.jpg" alt="Sympathy tribute" onerror="this.remove()"></div>
+        <div class="shop-body">
+          <h3>Sympathy Tribute</h3>
+          <p>Dignified funeral tributes and sympathy flowers, made with care.</p>
+          <div class="shop-price">from £40 <span>· tribute</span></div>
+          <a class="btn btn-primary" href="#order">Order</a>
+        </div>
+      </div>
+      <div class="shop-card">
+        <div class="shop-img"><img src="images/g3.jpg" alt="Bright & cheerful bouquet" onerror="this.remove()"></div>
+        <div class="shop-body">
+          <h3>Bright &amp; Cheerful</h3>
+          <p>A vibrant, happy bunch to brighten anyone's day.</p>
+          <div class="shop-price">from £28 <span>· gift</span></div>
+          <a class="btn btn-primary" href="#order">Order</a>
+        </div>
+      </div>
+    </div>
+    <p class="shop-note">Sample prices shown for the demo — Louise sets the real prices. Custom orders always welcome.</p>
   </div>
 </section>
 
@@ -318,6 +443,15 @@
   <p style="margin:10px 0">53 High Street, Hoddesdon, EN11 8TQ &nbsp;·&nbsp; <a href="tel:01992479794">01992 479794</a></p>
   <p style="opacity:.6;font-size:12px">Demo site · not affiliated · sample created to show a website design.</p>
 </footer>
+
+<div class="fabs">
+  <a class="fab fab-wa" href="https://wa.me/441992479794?text=Hi%20Louise%2C%20I%27d%20like%20to%20order%20some%20flowers%20please" target="_blank" rel="noopener" aria-label="Message us on WhatsApp" title="WhatsApp">
+    <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.149-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.71.306 1.263.489 1.694.625.712.227 1.36.195 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.885-9.885 9.885M20.52 3.449C18.24 1.245 15.24 0 12.045 0 5.463 0 .104 5.359.101 11.892c0 2.096.549 4.14 1.595 5.945L0 24l6.335-1.652a11.882 11.882 0 005.71 1.454h.005c6.585 0 11.946-5.359 11.949-11.893a11.821 11.821 0 00-3.48-8.464"/></svg>
+  </a>
+  <a class="fab fab-call" href="tel:01992479794" aria-label="Call the shop" title="Call 01992 479794">
+    <svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+  </a>
+</div>
 
 <script>
   // Demo handler — shows a success message. On the live site this emails the
