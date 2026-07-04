@@ -39,8 +39,9 @@
   .brand-sub{font-family:'Jost',sans-serif;font-size:9.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--ink-soft);margin-top:4px;font-weight:500}
   @media(max-width:520px){.brand-badge{height:54px}.brand-name{font-size:23px}.brand-sub{font-size:8px}}
   .nav-links{display:flex;gap:30px;align-items:center;font-size:14px}
-  .nav-links a{color:var(--ink-soft);transition:.15s}
-  .nav-links a:hover{color:var(--rose)}
+  .nav-links a:not(.btn){color:var(--ink-soft);transition:.15s}
+  .nav-links a:not(.btn):hover{color:var(--rose)}
+  .nav-links a.btn-primary{color:#fff}
   @media(max-width:760px){.nav-links a:not(.btn){display:none}}
 
   /* Hero */
