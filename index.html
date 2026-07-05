@@ -44,7 +44,16 @@
   .nav-links a:not(.btn){color:var(--ink-soft);transition:.15s}
   .nav-links a:not(.btn):hover{color:var(--rose)}
   .nav-links a.btn-primary{color:#fff}
-  @media(max-width:760px){.nav-links a:not(.btn){display:none}}
+  .nav-toggle{display:none;background:none;border:0;color:var(--ink);font-size:25px;line-height:1;cursor:pointer;padding:6px 4px}
+  @media(max-width:760px){
+    .nav-toggle{display:block}
+    .nav-links{position:absolute;top:100%;left:0;right:0;flex-direction:column;align-items:stretch;gap:0;
+      background:rgba(243,248,249,.98);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);
+      box-shadow:0 14px 28px rgba(31,60,64,.12);padding:6px 0;display:none}
+    nav.open .nav-links{display:flex}
+    .nav-links a{padding:13px 24px;font-size:15px}
+    .nav-links a.btn-primary{margin:8px 24px;border-radius:40px;justify-content:center}
+  }
 
   /* Hero */
   .hero{position:relative;min-height:82vh;display:flex;align-items:center;
@@ -206,6 +215,22 @@
 
   @media(prefers-reduced-motion:reduce){.reveal{opacity:1!important;transform:none!important;transition:none}.hero-bg{animation:none!important}}
 
+  /* Mobile layout pass */
+  @media(max-width:600px){
+    section{padding:54px 0}
+    .wrap{padding:0 18px}
+    .sec-head{margin-bottom:32px}
+    .hero{min-height:78vh}
+    .hero .lede{font-size:16.5px;margin-bottom:24px}
+    .hero-scrim{background:linear-gradient(rgba(237,246,247,.84),rgba(237,246,247,.72))}
+    .hero .cta{gap:10px}
+    .hero .cta .btn{flex:1;justify-content:center}
+    .order-card{padding:30px 22px 26px;border-radius:18px}
+    .trust-in{padding:22px 16px;gap:16px}
+    .fabs{right:14px;bottom:14px}
+    .map{height:280px}
+  }
+
   footer{background:var(--ink);color:#a6c3c5;text-align:center;padding:40px 24px;font-size:13px}
   footer .brand{color:#fff;font-size:23px;font-family:'Montserrat',sans-serif;font-weight:800;letter-spacing:-.02em}
   footer a{color:var(--gold)}
@@ -234,6 +259,7 @@
       <a href="#contact">Visit us</a>
       <a class="btn btn-primary" href="tel:01992479794">📞 01992 479794</a>
     </div>
+    <button class="nav-toggle" aria-label="Menu" aria-expanded="false">☰</button>
   </div>
 </nav>
 
@@ -517,6 +543,15 @@
     var n=document.querySelector('nav'); if(!n) return;
     function u(){ n.classList.toggle('scrolled', window.scrollY>8); }
     u(); window.addEventListener('scroll', u, {passive:true});
+  })();
+
+  // Mobile menu (hamburger)
+  (function(){
+    var n=document.querySelector('nav'), t=document.querySelector('.nav-toggle'); if(!n||!t) return;
+    t.addEventListener('click', function(){ var o=n.classList.toggle('open'); t.setAttribute('aria-expanded', o); t.textContent = o ? '✕' : '☰'; });
+    n.querySelectorAll('.nav-links a').forEach(function(a){
+      a.addEventListener('click', function(){ n.classList.remove('open'); t.setAttribute('aria-expanded','false'); t.textContent='☰'; });
+    });
   })();
 
   // Lightbox for gallery + shop photos
