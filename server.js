@@ -237,7 +237,8 @@ app.get("/admin", (req, res) => {
 // and toggling-off always work.
 app.use((req, res, next) => {
   if (!content.maintenance || isAdmin(req)) return next();
-  if (req.path === "/images/wonderful.jpg") return next(); // let the holding page's image through
+  // let the holding page image + the admin/login logo through the gate
+  if (req.path === "/images/wonderful.jpg" || req.path === "/images/louises-florist-logo-badge.png") return next();
   res.status(503).sendFile(path.join(__dirname, "views", "maintenance.html"));
 });
 
