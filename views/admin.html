@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Admin · Louise's Florist</title>
+<style>
+  :root{ --rose:#c94f7c; --rose-d:#a83b64; --ink:#3a2b31; --line:#f0d9e2; --muted:#8a7178;
+    --bg:#fdf4f7; --green:#2e7d51; --amber:#b26a00; }
+  *{ box-sizing:border-box; }
+  body{ margin:0; font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; background:var(--bg); color:var(--ink); }
+  header{ background:linear-gradient(160deg,var(--rose),#7e2b49); color:#fff; padding:16px 22px;
+    display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+  header .brand{ font-family:Georgia,serif; font-size:19px; font-weight:bold; }
+  header .sp{ flex:1; }
+  header a, header button{ color:#fff; font:inherit; font-size:13px; font-weight:600; text-decoration:none;
+    background:rgba(255,255,255,.15); border:none; border-radius:8px; padding:8px 12px; cursor:pointer; }
+  header a:hover, header button:hover{ background:rgba(255,255,255,.28); }
+  .wrap{ max-width:720px; margin:0 auto; padding:24px 18px 70px; }
+  h2{ font-size:13px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin:24px 0 10px; }
+
+  /* Maintenance card */
+  .maint{ background:#fff; border:1px solid var(--line); border-radius:14px; padding:18px 20px;
+    display:flex; align-items:center; gap:16px; }
+  .maint .txt b{ display:block; font-size:15px; }
+  .maint .txt span{ font-size:13px; color:var(--muted); }
+  .maint .sp{ flex:1; }
+  .switch{ position:relative; width:58px; height:32px; flex:none; }
+  .switch input{ opacity:0; width:0; height:0; }
+  .slider{ position:absolute; inset:0; background:#d9c3cc; border-radius:999px; transition:.2s; cursor:pointer; }
+  .slider::before{ content:""; position:absolute; height:24px; width:24px; left:4px; top:4px; background:#fff; border-radius:50%; transition:.2s; box-shadow:0 1px 3px rgba(0,0,0,.3); }
+  input:checked + .slider{ background:var(--amber); }
+  input:checked + .slider::before{ transform:translateX(26px); }
+  .maint-live{ font-size:13px; font-weight:700; color:var(--amber); display:none; margin-top:6px; }
+  body.maint-on .maint-live{ display:block; }
+
+  /* Boxes */
+  .box{ background:#fff; border:1px solid var(--line); border-radius:14px; padding:18px 20px; margin-bottom:14px; }
+  .box .row{ display:grid; grid-template-columns:1fr 150px; gap:12px; }
+  @media(max-width:520px){ .box .row{ grid-template-columns:1fr; } }
+  label{ display:block; font-size:12px; font-weight:700; color:var(--muted); margin:10px 0 4px; }
+  input[type=text], textarea{ width:100%; font:inherit; padding:.55em .7em; border:1px solid var(--line); border-radius:9px; background:#fff9fb; }
+  input:focus, textarea:focus{ outline:none; border-color:var(--rose); box-shadow:0 0 0 3px rgba(201,79,124,.2); background:#fff; }
+  textarea{ resize:vertical; }
+  .box-thumb{ float:right; width:54px; height:54px; border-radius:10px; object-fit:cover; margin:0 0 6px 12px; border:1px solid var(--line); }
+
+  .bar{ position:sticky; bottom:0; margin-top:22px; display:flex; align-items:center; gap:16px;
+    background:#fff; border:1px solid var(--line); border-radius:14px; padding:14px 18px; box-shadow:0 -6px 24px rgba(201,79,124,.1); }
+  .bar .sp{ flex:1; }
+  .status{ font-size:14px; font-weight:600; } .status.ok{ color:var(--green); } .status.err{ color:#b42318; }
+  .save{ font:inherit; font-weight:800; padding:11px 26px; border:none; border-radius:999px; background:var(--rose); color:#fff; cursor:pointer; }
+  .save:hover{ background:var(--rose-d); } .save:disabled{ opacity:.6; cursor:not-allowed; }
+  .note{ font-size:13px; color:var(--muted); margin:6px 2px 0; }
+</style>
+</head>
+<body>
+  <header>
+    <span class="brand">🌸 Louise's Florist</span>
+    <span style="font-size:13px;opacity:.85;">Admin</span>
+    <span class="sp"></span>
+    <a href="/" target="_blank">View site ↗</a>
+    <button id="logout">Log out</button>
+  </header>
+
+  <div class="wrap">
+    <h2>Maintenance mode</h2>
+    <div class="maint">
+      <div class="txt">
+        <b>Show a "back soon" page to visitors</b>
+        <span>Turn on while you're updating things. You'll still see the real site; visitors see a friendly holding page.</span>
+        <div class="maint-live">● LIVE: visitors currently see the "back soon" page.</div>
+      </div>
+      <span class="sp"></span>
+      <label class="switch"><input type="checkbox" id="maint"><span class="slider"></span></label>
+    </div>
+
+    <h2>Bouquet boxes</h2>
+    <div id="boxes"></div>
+    <p class="note">Prices are free text — write them however you like (e.g. "from £25", "£40", "P.O.A."). Photos come in the next update.</p>
+
+    <div class="bar">
+      <span class="status" id="status"></span>
+      <span class="sp"></span>
+      <button class="save" id="save">Save changes</button>
+    </div>
+  </div>
+
+<script>
+  const boxesEl=document.getElementById('boxes'), statusEl=document.getElementById('status'),
+        saveBtn=document.getElementById('save'), maintEl=document.getElementById('maint');
+  let data={ boxes:[], maintenance:false };
+  const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+  function boxCard(b){
+    return `<div class="box" data-id="${b.id}">
+      ${b.img?`<img class="box-thumb" src="/${esc(b.img)}" alt="" onerror="this.remove()">`:''}
+      <label>Title</label>
+      <input type="text" data-f="title" value="${esc(b.title)}" maxlength="80">
+      <div class="row">
+        <div><label>Price (free text)</label><input type="text" data-f="price" value="${esc(b.price)}" maxlength="40"></div>
+        <div><label>Tag</label><input type="text" data-f="tag" value="${esc(b.tag)}" maxlength="30"></div>
+      </div>
+      <label>Description</label>
+      <textarea data-f="desc" rows="2" maxlength="240">${esc(b.desc)}</textarea>
+    </div>`;
+  }
+  function flash(msg,ok){ statusEl.textContent=msg; statusEl.className='status'+(msg?(ok?' ok':' err'):''); }
+
+  async function load(){
+    const r=await fetch('/api/admin/content'); if(r.status===401){ location.href='/admin'; return; }
+    data=await r.json();
+    boxesEl.innerHTML=data.boxes.map(boxCard).join('');
+    maintEl.checked=!!data.maintenance;
+    document.body.classList.toggle('maint-on', maintEl.checked);
+    document.querySelectorAll('input,textarea').forEach(i=>i.addEventListener('input',()=>flash('')));
+    maintEl.addEventListener('change',()=>document.body.classList.toggle('maint-on', maintEl.checked));
+  }
+
+  saveBtn.addEventListener('click', async ()=>{
+    const boxes=[...boxesEl.querySelectorAll('.box')].map(el=>{
+      const g=f=>el.querySelector(`[data-f="${f}"]`).value;
+      return { id:el.dataset.id, title:g('title'), price:g('price'), tag:g('tag'), desc:g('desc') };
+    });
+    saveBtn.disabled=true; const t=saveBtn.textContent; saveBtn.textContent='Saving…';
+    try{
+      const r=await fetch('/api/admin/content',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({boxes,maintenance:maintEl.checked})});
+      if(r.status===401){ location.href='/admin'; return; }
+      const d=await r.json().catch(()=>({}));
+      if(r.ok){ data=d; flash('Saved — live on the site.',true); }
+      else flash(d.error||'Could not save.',false);
+    }catch(_){ flash('Something went wrong saving.',false); }
+    finally{ saveBtn.disabled=false; saveBtn.textContent=t; }
+  });
+  document.getElementById('logout').addEventListener('click', async ()=>{ await fetch('/api/logout',{method:'POST'}); location.href='/admin'; });
+  load();
+</script>
+</body>
+</html>

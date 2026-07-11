@@ -1,0 +1,16 @@
+{
+  "name": "louises-florist",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Louise's Florist — brochure site with a self-service admin (Express on Render).",
+  "engines": { "node": ">=18" },
+  "scripts": { "start": "node server.js" },
+  "dependencies": {
+    "express": "^4.19.2",
+    "mongoose": "^8.8.0",
+    "otplib": "^12.0.1",
+    "qrcode": "^1.5.4",
+    "express-rate-limit": "^7.4.0"
+  }
+}

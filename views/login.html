@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Admin sign in · Louise's Florist</title>
+<style>
+  :root{ --rose:#c94f7c; --rose-d:#a83b64; --ink:#3a2b31; --line:#f0d9e2; --muted:#8a7178; }
+  *{ box-sizing:border-box; }
+  body{ margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    background:linear-gradient(160deg,#c94f7c,#7e2b49); padding:24px; }
+  .card{ width:100%; max-width:380px; background:#fff; border-radius:18px; padding:30px;
+    box-shadow:0 24px 60px rgba(0,0,0,.3); }
+  .brand{ font-family:Georgia,serif; font-size:22px; font-weight:bold; color:var(--rose); }
+  h1{ font-size:15px; margin:12px 0 20px; color:var(--muted); font-weight:600; }
+  label{ display:block; font-size:13px; font-weight:700; margin-bottom:6px; color:var(--ink); }
+  input{ width:100%; font:inherit; padding:.7em .8em; border:1px solid var(--line); border-radius:10px; background:#fff9fb; }
+  input:focus{ outline:none; border-color:var(--rose); box-shadow:0 0 0 3px rgba(201,79,124,.2); background:#fff; }
+  button{ width:100%; margin-top:16px; font:inherit; font-weight:800; padding:12px; border:none; border-radius:999px;
+    background:var(--rose); color:#fff; cursor:pointer; }
+  button:hover{ background:var(--rose-d); }
+  button:disabled{ opacity:.6; cursor:not-allowed; }
+  .err{ color:#b42318; font-size:13px; font-weight:600; margin-top:12px; min-height:1.1em; }
+</style>
+</head>
+<body>
+  <form class="card" id="f">
+    <div class="brand">🌸 Louise's Florist</div>
+    <h1>Admin sign in</h1>
+    <label for="pw">Password</label>
+    <input type="password" id="pw" autocomplete="current-password" autofocus />
+    <div id="totp-wrap" style="display:none">
+      <label for="totp" style="margin-top:14px;">Authenticator code</label>
+      <input id="totp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="6-digit code" />
+    </div>
+    <button type="submit" id="btn">Sign in</button>
+    <p class="err" id="err"></p>
+  </form>
+<script>
+  const f=document.getElementById('f'), pw=document.getElementById('pw'), btn=document.getElementById('btn'),
+        err=document.getElementById('err'), totpWrap=document.getElementById('totp-wrap'), totp=document.getElementById('totp');
+  let totpRequired=false;
+  fetch('/api/login-config').then(r=>r.json()).then(c=>{ if(c.totp){ totpRequired=true; totpWrap.style.display='block'; } }).catch(()=>{});
+  f.addEventListener('submit', async (e)=>{
+    e.preventDefault(); err.textContent=''; btn.disabled=true; const t=btn.textContent; btn.textContent='Signing in…';
+    try{
+      const body={ password:pw.value }; if(totpRequired) body.totp=totp.value;
+      const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+      if(r.ok){ location.href='/admin'; return; }
+      if(r.status===429){ err.textContent='Too many attempts — wait a few minutes.'; return; }
+      const d=await r.json().catch(()=>({}));
+      if(d.totp){ err.textContent='Incorrect authenticator code.'; totp.focus(); }
+      else if(d.error==='Admin not configured'){ err.textContent='Admin not configured yet.'; }
+      else { err.textContent='Incorrect password.'; }
+    }catch(_){ err.textContent='Something went wrong. Try again.'; }
+    finally{ btn.disabled=false; btn.textContent=t; }
+  });
+</script>
+</body>
+</html>
