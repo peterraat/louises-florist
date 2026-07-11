@@ -23,11 +23,10 @@
   header a, header button{ font:inherit; font-size:13px; font-weight:600; text-decoration:none; color:var(--ink);
     background:var(--cream-2); border:none; border-radius:8px; padding:8px 12px; cursor:pointer; }
   header a:hover, header button:hover{ background:var(--line); }
-  .wrap{ max-width:720px; margin:0 auto; padding:24px 18px 72px; }
-  h2{ font-size:12px; text-transform:uppercase; letter-spacing:.1em; color:var(--ink-soft); margin:26px 0 10px; font-weight:700; }
+  .wrap{ max-width:720px; margin:0 auto; padding:24px 18px 84px; }
+  h2{ font-size:12px; text-transform:uppercase; letter-spacing:.1em; color:var(--teal); margin:28px 0 10px; font-weight:800; }
   .card{ background:#fff; border:1px solid var(--line); border-radius:16px; padding:18px 20px; margin-bottom:14px; }
 
-  /* Maintenance */
   .maint{ display:flex; align-items:center; gap:16px; }
   .maint .txt b{ display:block; font-size:15px; } .maint .txt span{ font-size:13px; color:var(--ink-soft); }
   .maint .sp{ flex:1; }
@@ -46,10 +45,10 @@
   textarea{ resize:vertical; }
   .hint{ font-size:11px; color:var(--ink-soft); font-weight:500; text-transform:none; letter-spacing:0; margin-top:4px; }
   .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
-  @media(max-width:520px){ .grid2, .box .row{ grid-template-columns:1fr; } }
-
   .box .row{ display:grid; grid-template-columns:1fr 150px; gap:12px; }
-  .box-thumb{ float:right; width:54px; height:54px; border-radius:10px; object-fit:cover; margin:0 0 6px 12px; border:1px solid var(--line); }
+  @media(max-width:520px){ .grid2, .box .row, .hours-row{ grid-template-columns:1fr; } }
+  .thumb{ float:right; width:54px; height:54px; border-radius:10px; object-fit:cover; margin:0 0 6px 12px; border:1px solid var(--line); }
+  .hours-row{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:8px; }
 
   .bar{ position:sticky; bottom:0; margin-top:22px; display:flex; align-items:center; gap:16px;
     background:#fff; border:1px solid var(--line); border-radius:16px; padding:14px 18px; box-shadow:0 -6px 24px rgba(31,60,64,.08); }
@@ -82,25 +81,40 @@
       <label class="switch"><input type="checkbox" id="maint"><span class="slider"></span></label>
     </div>
 
+    <h2>Hero (top of page)</h2>
+    <div class="card">
+      <label>Small heading (eyebrow)</label>
+      <input type="text" id="h-eyebrow" maxlength="80">
+      <label>Main heading</label>
+      <input type="text" id="h-heading" maxlength="120">
+      <label>Intro text</label>
+      <textarea id="h-lede" rows="3" maxlength="400"></textarea>
+    </div>
+
+    <h2>Services (the 4 "what we do" cards)</h2>
+    <div id="services"></div>
+
+    <h2>Bouquet boxes (order online)</h2>
+    <div id="boxes"></div>
+    <p class="note">Prices are free text — write them however you like (e.g. "from £25", "£40", "P.O.A."). Photos come in the next update.</p>
+
+    <h2>Gallery captions</h2>
+    <div id="gallery"></div>
+    <p class="note">Captions only for now — photos become editable in the next update.</p>
+
     <h2>Contact details</h2>
     <div class="card">
       <div class="grid2">
-        <div>
-          <label>WhatsApp number</label>
-          <input type="text" id="wa" maxlength="20">
-          <div class="hint">International format, digits only, no "+". e.g. 447930318018</div>
-        </div>
-        <div>
-          <label>Phone number</label>
-          <input type="text" id="phone" maxlength="30">
-          <div class="hint">As shown on the site. e.g. 01992 479794</div>
-        </div>
+        <div><label>Shop name</label><input type="text" id="c-name" maxlength="80"></div>
+        <div><label>Address</label><input type="text" id="c-address" maxlength="160"></div>
+        <div><label>Phone number</label><input type="text" id="c-phone" maxlength="30"><div class="hint">e.g. 01992 479794</div></div>
+        <div><label>WhatsApp number</label><input type="text" id="c-whatsapp" maxlength="20"><div class="hint">Digits only, no "+". e.g. 447930318018</div></div>
+        <div><label>Email</label><input type="text" id="c-email" maxlength="120"></div>
+        <div><label>Facebook URL</label><input type="text" id="c-facebook" maxlength="200"></div>
       </div>
+      <label style="margin-top:16px;">Opening hours</label>
+      <div id="hours"></div>
     </div>
-
-    <h2>Bouquet boxes</h2>
-    <div id="boxes"></div>
-    <p class="note">Prices are free text — write them however you like (e.g. "from £25", "£40", "P.O.A."). Photos come in the next update.</p>
 
     <div class="bar">
       <span class="status" id="status"></span>
@@ -110,47 +124,87 @@
   </div>
 
 <script>
-  const boxesEl=document.getElementById('boxes'), statusEl=document.getElementById('status'), saveBtn=document.getElementById('save'),
-        maintEl=document.getElementById('maint'), waEl=document.getElementById('wa'), phoneEl=document.getElementById('phone');
-  let data={ boxes:[], contact:{}, maintenance:false };
+  const $=id=>document.getElementById(id);
+  const servicesEl=$('services'), boxesEl=$('boxes'), galleryEl=$('gallery'), hoursEl=$('hours'),
+        statusEl=$('status'), saveBtn=$('save'), maintEl=$('maint');
+  let data={};
   const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const flash=(m,ok)=>{ statusEl.textContent=m; statusEl.className='status'+(m?(ok?' ok':' err'):''); };
 
-  function boxCard(b){
-    return `<div class="card box" data-id="${b.id}">
-      ${b.img?`<img class="box-thumb" src="/${esc(b.img)}" alt="" onerror="this.remove()">`:''}
-      <label>Title</label>
-      <input type="text" data-f="title" value="${esc(b.title)}" maxlength="80">
-      <div class="row">
-        <div><label>Price (free text)</label><input type="text" data-f="price" value="${esc(b.price)}" maxlength="40"></div>
-        <div><label>Tag</label><input type="text" data-f="tag" value="${esc(b.tag)}" maxlength="30"></div>
-      </div>
-      <label>Description</label>
-      <textarea data-f="desc" rows="2" maxlength="240">${esc(b.desc)}</textarea>
+  function serviceCard(s){
+    return `<div class="card svc" data-id="${s.id}">
+      <label>Title</label><input type="text" data-f="title" value="${esc(s.title)}" maxlength="60">
+      <label>Description</label><textarea data-f="desc" rows="2" maxlength="240">${esc(s.desc)}</textarea>
     </div>`;
   }
-  function flash(msg,ok){ statusEl.textContent=msg; statusEl.className='status'+(msg?(ok?' ok':' err'):''); }
+  function boxCard(b){
+    return `<div class="card box" data-id="${b.id}">
+      ${b.img?`<img class="thumb" src="/${esc(b.img)}" alt="" onerror="this.remove()">`:''}
+      <label>Title</label><input type="text" data-f="title" value="${esc(b.title)}" maxlength="80">
+      <div class="row">
+        <div><label>Price</label><input type="text" data-f="price" value="${esc(b.price)}" maxlength="40"></div>
+        <div><label>Tag</label><input type="text" data-f="tag" value="${esc(b.tag)}" maxlength="30"></div>
+      </div>
+      <label>Description</label><textarea data-f="desc" rows="2" maxlength="240">${esc(b.desc)}</textarea>
+    </div>`;
+  }
+  function galCard(g){
+    return `<div class="card gal" data-id="${g.id}">
+      ${g.img?`<img class="thumb" src="/${esc(g.img)}" alt="" onerror="this.remove()">`:''}
+      <label>Caption</label><input type="text" data-f="caption" value="${esc(g.caption)}" maxlength="60">
+    </div>`;
+  }
+  function hoursRow(h,i){
+    return `<div class="hours-row" data-i="${i}">
+      <input type="text" data-f="day" value="${esc(h.day)}" maxlength="30" placeholder="e.g. Mon – Fri">
+      <input type="text" data-f="time" value="${esc(h.time)}" maxlength="30" placeholder="e.g. 9:00 – 5:00">
+    </div>`;
+  }
 
   async function load(){
     const r=await fetch('/api/admin/content'); if(r.status===401){ location.href='/admin'; return; }
     data=await r.json();
+    // hero
+    $('h-eyebrow').value=data.hero.eyebrow||''; $('h-heading').value=data.hero.heading||''; $('h-lede').value=data.hero.lede||'';
+    // lists
+    servicesEl.innerHTML=data.services.map(serviceCard).join('');
     boxesEl.innerHTML=data.boxes.map(boxCard).join('');
-    waEl.value=(data.contact&&data.contact.whatsapp)||'';
-    phoneEl.value=(data.contact&&data.contact.phone)||'';
-    maintEl.checked=!!data.maintenance;
-    document.body.classList.toggle('maint-on', maintEl.checked);
+    galleryEl.innerHTML=data.gallery.map(galCard).join('');
+    // contact
+    const c=data.contact||{};
+    $('c-name').value=c.name||''; $('c-address').value=c.address||''; $('c-phone').value=c.phone||'';
+    $('c-whatsapp').value=c.whatsapp||''; $('c-email').value=c.email||''; $('c-facebook').value=c.facebook||'';
+    hoursEl.innerHTML=(c.hours||[]).map(hoursRow).join('');
+    // maintenance
+    maintEl.checked=!!data.maintenance; document.body.classList.toggle('maint-on', maintEl.checked);
     document.querySelectorAll('input,textarea').forEach(i=>i.addEventListener('input',()=>flash('')));
     maintEl.addEventListener('change',()=>document.body.classList.toggle('maint-on', maintEl.checked));
   }
 
-  saveBtn.addEventListener('click', async ()=>{
-    const boxes=[...boxesEl.querySelectorAll('.box')].map(el=>{
-      const g=f=>el.querySelector(`[data-f="${f}"]`).value;
-      return { id:el.dataset.id, title:g('title'), price:g('price'), tag:g('tag'), desc:g('desc') };
+  function collectList(root, sel, fields){
+    return [...root.querySelectorAll(sel)].map(el=>{
+      const o={ id:el.dataset.id };
+      fields.forEach(f=>{ o[f]=el.querySelector(`[data-f="${f}"]`).value; });
+      return o;
     });
-    const contact={ whatsapp:waEl.value, phone:phoneEl.value };
+  }
+
+  saveBtn.addEventListener('click', async ()=>{
+    const payload={
+      hero:{ eyebrow:$('h-eyebrow').value, heading:$('h-heading').value, lede:$('h-lede').value },
+      services: collectList(servicesEl,'.svc',['title','desc']),
+      boxes: collectList(boxesEl,'.box',['title','price','tag','desc']),
+      gallery: collectList(galleryEl,'.gal',['caption']),
+      contact:{
+        name:$('c-name').value, address:$('c-address').value, phone:$('c-phone').value,
+        whatsapp:$('c-whatsapp').value, email:$('c-email').value, facebook:$('c-facebook').value,
+        hours:[...hoursEl.querySelectorAll('.hours-row')].map(r=>({ day:r.querySelector('[data-f="day"]').value, time:r.querySelector('[data-f="time"]').value }))
+      },
+      maintenance: maintEl.checked
+    };
     saveBtn.disabled=true; const t=saveBtn.textContent; saveBtn.textContent='Saving…';
     try{
-      const r=await fetch('/api/admin/content',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({boxes,contact,maintenance:maintEl.checked})});
+      const r=await fetch('/api/admin/content',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
       if(r.status===401){ location.href='/admin'; return; }
       const d=await r.json().catch(()=>({}));
       if(r.ok){ data=d; flash('Saved — live on the site.',true); }
@@ -158,7 +212,7 @@
     }catch(_){ flash('Something went wrong saving.',false); }
     finally{ saveBtn.disabled=false; saveBtn.textContent=t; }
   });
-  document.getElementById('logout').addEventListener('click', async ()=>{ await fetch('/api/logout',{method:'POST'}); location.href='/admin'; });
+  $('logout').addEventListener('click', async ()=>{ await fetch('/api/logout',{method:'POST'}); location.href='/admin'; });
   load();
 </script>
 </body>

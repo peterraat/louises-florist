@@ -482,7 +482,6 @@
           <div><b>Mon – Fri</b><span>9:00 – 5:00</span></div>
           <div><b>Saturday</b><span>9:00 – 4:00</span></div>
           <div><b>Sunday</b><span>Closed</span></div>
-          <p style="font-size:11px;color:var(--ink-soft);margin-top:8px">Opening hours shown are examples — we'll set Louise's real times.</p>
         </div>
       </div>
       <iframe class="map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
@@ -494,7 +493,7 @@
 <footer>
   <div class="brand">Louise's <span style="color:var(--gold)">Florist</span></div>
   <p style="margin:10px 0">53 High Street, Hoddesdon, EN11 8TQ &nbsp;·&nbsp; <a href="tel:01992479794">01992 479794</a></p>
-  <p style="opacity:.6;font-size:12px">Demo site · not affiliated · sample created to show a website design.</p>
+  <p style="opacity:.6;font-size:12px">© Louise's Florist, Hoddesdon.</p>
 </footer>
 
 <div class="lightbox" id="lightbox" aria-hidden="true">
@@ -517,32 +516,54 @@
   // request fails.
   (function loadContent(){
     function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+    function txt(sel,v){ var e=document.querySelector(sel); if(e&&v!=null) e.textContent=v; }
     fetch('/api/content').then(function(r){ return r.json(); }).then(function(d){
-      if(!d || !d.boxes) return;
-      var cards = document.querySelectorAll('#shop .shop-card');
-      d.boxes.forEach(function(b,i){
-        var card = cards[i]; if(!card) return;
-        var h = card.querySelector('h3'); if(h) h.textContent = b.title;
-        var p = card.querySelector('.shop-body p'); if(p) p.textContent = b.desc;
-        var price = card.querySelector('.shop-price');
-        if(price) price.innerHTML = esc(b.price) + (b.tag ? ' <span>· ' + esc(b.tag) + '</span>' : '');
-      });
-      // Contact numbers (WhatsApp + phone), editable in /admin
+      if(!d) return;
+      // Hero
+      if(d.hero){ txt('.hero-in .eyebrow',d.hero.eyebrow); txt('.hero-in h1',d.hero.heading); txt('.hero-in .lede',d.hero.lede); }
+      // Services (4 cards)
+      if(Array.isArray(d.services)){
+        var svc=document.querySelectorAll('#services .cards .card');
+        d.services.forEach(function(s,i){ var c=svc[i]; if(!c) return;
+          var h=c.querySelector('h3'); if(h) h.textContent=s.title;
+          var p=c.querySelector('p'); if(p) p.textContent=s.desc; });
+      }
+      // Shop boxes (6)
+      if(Array.isArray(d.boxes)){
+        var cards=document.querySelectorAll('#shop .shop-card');
+        d.boxes.forEach(function(b,i){ var card=cards[i]; if(!card) return;
+          var h=card.querySelector('h3'); if(h) h.textContent=b.title;
+          var p=card.querySelector('.shop-body p'); if(p) p.textContent=b.desc;
+          var price=card.querySelector('.shop-price'); if(price) price.innerHTML=esc(b.price)+(b.tag?' <span>· '+esc(b.tag)+'</span>':''); });
+      }
+      // Gallery captions (6)
+      if(Array.isArray(d.gallery)){
+        var tiles=document.querySelectorAll('#gallery .grid .tile');
+        d.gallery.forEach(function(g,i){ var t=tiles[i]; if(!t) return;
+          var s=t.querySelector('span'); if(s) s.textContent=g.caption;
+          var im=t.querySelector('img'); if(im) im.alt=g.caption; });
+      }
+      // Contact
       if(d.contact){
-        var wa = String(d.contact.whatsapp||'').replace(/[^\d]/g,'');
-        if(wa){
-          document.querySelectorAll('a.fab-wa, a[href*="wa.me"]').forEach(function(a){
-            a.href = 'https://wa.me/' + wa + '?text=' + encodeURIComponent("Hi Louise, I'd like to order some flowers please");
-          });
+        var c=d.contact;
+        document.querySelectorAll('#contact .info-row').forEach(function(row){
+          var ic=((row.querySelector('.ic')||{}).textContent)||'';
+          if(ic.indexOf('📍')>-1){ var b=row.querySelector('b'), sp=row.querySelector('span'); if(b&&c.name) b.textContent=c.name; if(sp&&c.address) sp.textContent=c.address; }
+          else if(ic.indexOf('✉')>-1){ var e=row.querySelector('span'); if(e&&c.email) e.textContent=c.email; }
+          else if(ic.indexOf('💬')>-1){ var a=row.querySelector('a'); if(a&&c.facebook) a.href=c.facebook; }
+        });
+        if(Array.isArray(c.hours)){
+          var hrows=document.querySelectorAll('#contact .hours > div');
+          c.hours.forEach(function(h,i){ var hr=hrows[i]; if(!hr) return;
+            var b=hr.querySelector('b'), sp=hr.querySelector('span'); if(b&&h.day) b.textContent=h.day; if(sp&&h.time) sp.textContent=h.time; });
         }
-        var phone = String(d.contact.phone||'');
-        if(phone){
-          var telHref = 'tel:' + phone.replace(/\s+/g,'');
-          document.querySelectorAll('a[href^="tel:"]').forEach(function(a){
-            a.href = telHref;
-            if(/^[\d\s()+]+$/.test(a.textContent.trim())) a.textContent = phone;
-          });
-        }
+        var wa=String(c.whatsapp||'').replace(/[^\d]/g,'');
+        if(wa){ document.querySelectorAll('a.fab-wa, a[href*="wa.me"]').forEach(function(a){ a.href='https://wa.me/'+wa+'?text='+encodeURIComponent("Hi Louise, I'd like to order some flowers please"); }); }
+        var phone=String(c.phone||'');
+        if(phone){ var telHref='tel:'+phone.replace(/\s+/g,'');
+          document.querySelectorAll('a[href^="tel:"]').forEach(function(a){ a.href=telHref;
+            var tx=a.textContent.trim();
+            if(/^[\d\s()+]+$/.test(tx)) a.textContent=phone; else if(tx.charAt(0)==='📞'||tx.indexOf('📞')===0) a.textContent='📞 '+phone; }); }
       }
     }).catch(function(){});
   })();
