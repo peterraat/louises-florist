@@ -5,29 +5,37 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="robots" content="noindex, nofollow" />
 <title>Admin sign in · Louise's Florist</title>
+<link rel="icon" type="image/png" href="/images/louises-florist-logo-badge.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root{ --rose:#c94f7c; --rose-d:#a83b64; --ink:#3a2b31; --line:#f0d9e2; --muted:#8a7178; }
-  *{ box-sizing:border-box; }
-  body{ margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
-    font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
-    background:linear-gradient(160deg,#c94f7c,#7e2b49); padding:24px; }
-  .card{ width:100%; max-width:380px; background:#fff; border-radius:18px; padding:30px;
-    box-shadow:0 24px 60px rgba(0,0,0,.3); }
-  .brand{ font-family:Georgia,serif; font-size:22px; font-weight:bold; color:var(--rose); }
-  h1{ font-size:15px; margin:12px 0 20px; color:var(--muted); font-weight:600; }
-  label{ display:block; font-size:13px; font-weight:700; margin-bottom:6px; color:var(--ink); }
-  input{ width:100%; font:inherit; padding:.7em .8em; border:1px solid var(--line); border-radius:10px; background:#fff9fb; }
-  input:focus{ outline:none; border-color:var(--rose); box-shadow:0 0 0 3px rgba(201,79,124,.2); background:#fff; }
-  button{ width:100%; margin-top:16px; font:inherit; font-weight:800; padding:12px; border:none; border-radius:999px;
-    background:var(--rose); color:#fff; cursor:pointer; }
-  button:hover{ background:var(--rose-d); }
+  :root{ --teal:#2b8f9b; --teal-dk:#1f6f79; --cream:#f3f8f9; --ink:#26383c; --ink-soft:#5d7176; --line:#d5e4e6; }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{ min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;
+    font-family:'Montserrat',-apple-system,'Segoe UI',Roboto,sans-serif; color:var(--ink);
+    background:linear-gradient(140deg,#cbe7ea 0%,#edf6f7 50%,#d8ecec 100%); }
+  .card{ width:100%; max-width:390px; background:#fff; border-radius:20px; padding:34px 30px;
+    box-shadow:0 24px 60px rgba(31,60,64,.18); border:1px solid var(--line); text-align:center; }
+  .badge{ height:66px; width:auto; display:block; margin:0 auto 10px; }
+  .brand-name{ font-size:24px; font-weight:800; letter-spacing:-.02em; }
+  .brand-name .r{ color:var(--teal); }
+  h1{ font-size:14px; margin:14px 0 22px; color:var(--ink-soft); font-weight:600; letter-spacing:.02em; }
+  form{ text-align:left; }
+  label{ display:block; font-size:12px; font-weight:700; margin-bottom:6px; color:var(--ink-soft);
+    text-transform:uppercase; letter-spacing:.06em; }
+  input{ width:100%; font:inherit; padding:.7em .85em; border:1px solid var(--line); border-radius:12px; background:var(--cream); }
+  input:focus{ outline:none; border-color:var(--teal); box-shadow:0 0 0 3px rgba(43,143,155,.2); background:#fff; }
+  button{ width:100%; margin-top:18px; font:inherit; font-weight:700; padding:13px; border:none; border-radius:40px;
+    background:var(--teal); color:#fff; cursor:pointer; transition:.2s; }
+  button:hover{ background:var(--teal-dk); }
   button:disabled{ opacity:.6; cursor:not-allowed; }
-  .err{ color:#b42318; font-size:13px; font-weight:600; margin-top:12px; min-height:1.1em; }
+  .err{ color:#b42318; font-size:13px; font-weight:600; margin-top:12px; min-height:1.1em; text-align:center; }
 </style>
 </head>
 <body>
   <form class="card" id="f">
-    <div class="brand">🌸 Louise's Florist</div>
+    <img class="badge" src="/images/louises-florist-logo-badge.png" alt="" onerror="this.remove()" />
+    <div class="brand-name">Louise's <span class="r">Florist</span></div>
     <h1>Admin sign in</h1>
     <label for="pw">Password</label>
     <input type="password" id="pw" autocomplete="current-password" autofocus />

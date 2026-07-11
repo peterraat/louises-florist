@@ -27,12 +27,14 @@ const DEFAULT_CONTENT = {
     { id: "b5", title: "Sympathy Tribute",   desc: "Dignified funeral tributes and sympathy flowers, made with care.", price: "from £40", tag: "tribute",  img: "images/g5.jpg" },
     { id: "b6", title: "Bright & Cheerful",  desc: "A vibrant, happy bunch to brighten anyone's day.",                 price: "from £28", tag: "bouquet",  img: "images/g3.jpg" }
   ],
+  contact: { whatsapp: "447930318018", phone: "01992479794" },
   maintenance: false
 };
 
 const Content = mongoose.model("Content", new mongoose.Schema({
   _id: { type: String, default: "singleton" },
   boxes: [{ _id: false, id: String, title: String, desc: String, price: String, tag: String, img: String }],
+  contact: { _id: false, whatsapp: String, phone: String },
   maintenance: Boolean,
   updatedAt: Date
 }, { versionKey: false }));
@@ -51,7 +53,7 @@ async function initContent() {
       await Content.create({ _id: "singleton", ...DEFAULT_CONTENT, updatedAt: new Date() });
       doc = await Content.findById("singleton").lean();
     }
-    content = { boxes: doc.boxes, maintenance: !!doc.maintenance };
+    content = { boxes: doc.boxes, contact: doc.contact || DEFAULT_CONTENT.contact, maintenance: !!doc.maintenance };
     console.log("Content loaded from MongoDB");
   } catch (err) {
     console.error("Mongo connect/load failed — using default content:", err.message);
@@ -94,7 +96,7 @@ function requireAuth(req, res, next) { return isAdmin(req) ? next() : res.status
 /* ===================== PUBLIC API ===================== */
 app.get("/api/content", (req, res) => {
   res.set("Cache-Control", "no-store");
-  res.json({ boxes: content.boxes });
+  res.json({ boxes: content.boxes, contact: content.contact });
 });
 app.get("/api/login-config", (req, res) => res.json({ totp: TOTP_ENABLED }));
 app.get("/healthz", (req, res) => res.json({ ok: true }));
@@ -124,7 +126,7 @@ app.get("/api/admin/totp-qr", requireAuth, async (req, res) => {
 });
 
 /* ===================== ADMIN API ===================== */
-app.get("/api/admin/content", requireAuth, (req, res) => res.json({ boxes: content.boxes, maintenance: content.maintenance }));
+app.get("/api/admin/content", requireAuth, (req, res) => res.json({ boxes: content.boxes, contact: content.contact, maintenance: content.maintenance }));
 
 app.post("/api/admin/content", requireAuth, async (req, res) => {
   if (!dbReady) return res.status(503).json({ error: "Database not connected — changes can't be saved" });
@@ -141,10 +143,15 @@ app.post("/api/admin/content", requireAuth, async (req, res) => {
         tag:   inp.tag   !== undefined ? clean(inp.tag, 30)  : b.tag
       };
     });
+    const c = body.contact || {};
+    const contact = {
+      whatsapp: c.whatsapp !== undefined ? clean(c.whatsapp, 20).replace(/[^\d]/g, "") : content.contact.whatsapp,
+      phone: c.phone !== undefined ? clean(c.phone, 30) : content.contact.phone
+    };
     const maintenance = body.maintenance === undefined ? content.maintenance : !!body.maintenance;
-    await Content.findByIdAndUpdate("singleton", { boxes, maintenance, updatedAt: new Date() }, { upsert: true });
-    content = { boxes, maintenance };
-    res.json({ ok: true, boxes, maintenance });
+    await Content.findByIdAndUpdate("singleton", { boxes, contact, maintenance, updatedAt: new Date() }, { upsert: true });
+    content = { boxes, contact, maintenance };
+    res.json({ ok: true, boxes, contact, maintenance });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
@@ -161,6 +168,7 @@ app.get("/admin", (req, res) => {
 // and toggling-off always work.
 app.use((req, res, next) => {
   if (!content.maintenance || isAdmin(req)) return next();
+  if (req.path === "/images/wonderful.jpg") return next(); // let the holding page's image through
   res.status(503).sendFile(path.join(__dirname, "views", "maintenance.html"));
 });
 

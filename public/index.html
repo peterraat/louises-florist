@@ -527,6 +527,23 @@
         var price = card.querySelector('.shop-price');
         if(price) price.innerHTML = esc(b.price) + (b.tag ? ' <span>· ' + esc(b.tag) + '</span>' : '');
       });
+      // Contact numbers (WhatsApp + phone), editable in /admin
+      if(d.contact){
+        var wa = String(d.contact.whatsapp||'').replace(/[^\d]/g,'');
+        if(wa){
+          document.querySelectorAll('a.fab-wa, a[href*="wa.me"]').forEach(function(a){
+            a.href = 'https://wa.me/' + wa + '?text=' + encodeURIComponent("Hi Louise, I'd like to order some flowers please");
+          });
+        }
+        var phone = String(d.contact.phone||'');
+        if(phone){
+          var telHref = 'tel:' + phone.replace(/\s+/g,'');
+          document.querySelectorAll('a[href^="tel:"]').forEach(function(a){
+            a.href = telHref;
+            if(/^[\d\s()+]+$/.test(a.textContent.trim())) a.textContent = phone;
+          });
+        }
+      }
     }).catch(function(){});
   })();
 

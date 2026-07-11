@@ -5,59 +5,66 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="robots" content="noindex, nofollow" />
 <title>Admin · Louise's Florist</title>
+<link rel="icon" type="image/png" href="/images/louises-florist-logo-badge.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root{ --rose:#c94f7c; --rose-d:#a83b64; --ink:#3a2b31; --line:#f0d9e2; --muted:#8a7178;
-    --bg:#fdf4f7; --green:#2e7d51; --amber:#b26a00; }
-  *{ box-sizing:border-box; }
-  body{ margin:0; font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; background:var(--bg); color:var(--ink); }
-  header{ background:linear-gradient(160deg,var(--rose),#7e2b49); color:#fff; padding:16px 22px;
-    display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
-  header .brand{ font-family:Georgia,serif; font-size:19px; font-weight:bold; }
+  :root{ --teal:#2b8f9b; --teal-dk:#1f6f79; --gold:#c49a53; --cream:#f3f8f9; --cream-2:#e2eef0;
+    --ink:#26383c; --ink-soft:#5d7176; --line:#d5e4e6; --green:#2e7d51; --amber:#b26a00; }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{ font-family:'Montserrat',-apple-system,'Segoe UI',Roboto,sans-serif; background:var(--cream); color:var(--ink); }
+  header{ background:#fff; border-bottom:1px solid var(--line); padding:12px 20px;
+    display:flex; align-items:center; gap:14px; flex-wrap:wrap; position:sticky; top:0; z-index:10; }
+  header img{ height:44px; width:auto; }
+  header .brand{ font-size:19px; font-weight:800; letter-spacing:-.02em; }
+  header .brand .r{ color:var(--teal); }
+  header .tag{ font-size:12px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.1em; }
   header .sp{ flex:1; }
-  header a, header button{ color:#fff; font:inherit; font-size:13px; font-weight:600; text-decoration:none;
-    background:rgba(255,255,255,.15); border:none; border-radius:8px; padding:8px 12px; cursor:pointer; }
-  header a:hover, header button:hover{ background:rgba(255,255,255,.28); }
-  .wrap{ max-width:720px; margin:0 auto; padding:24px 18px 70px; }
-  h2{ font-size:13px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin:24px 0 10px; }
+  header a, header button{ font:inherit; font-size:13px; font-weight:600; text-decoration:none; color:var(--ink);
+    background:var(--cream-2); border:none; border-radius:8px; padding:8px 12px; cursor:pointer; }
+  header a:hover, header button:hover{ background:var(--line); }
+  .wrap{ max-width:720px; margin:0 auto; padding:24px 18px 72px; }
+  h2{ font-size:12px; text-transform:uppercase; letter-spacing:.1em; color:var(--ink-soft); margin:26px 0 10px; font-weight:700; }
+  .card{ background:#fff; border:1px solid var(--line); border-radius:16px; padding:18px 20px; margin-bottom:14px; }
 
-  /* Maintenance card */
-  .maint{ background:#fff; border:1px solid var(--line); border-radius:14px; padding:18px 20px;
-    display:flex; align-items:center; gap:16px; }
-  .maint .txt b{ display:block; font-size:15px; }
-  .maint .txt span{ font-size:13px; color:var(--muted); }
+  /* Maintenance */
+  .maint{ display:flex; align-items:center; gap:16px; }
+  .maint .txt b{ display:block; font-size:15px; } .maint .txt span{ font-size:13px; color:var(--ink-soft); }
   .maint .sp{ flex:1; }
   .switch{ position:relative; width:58px; height:32px; flex:none; }
   .switch input{ opacity:0; width:0; height:0; }
-  .slider{ position:absolute; inset:0; background:#d9c3cc; border-radius:999px; transition:.2s; cursor:pointer; }
-  .slider::before{ content:""; position:absolute; height:24px; width:24px; left:4px; top:4px; background:#fff; border-radius:50%; transition:.2s; box-shadow:0 1px 3px rgba(0,0,0,.3); }
+  .slider{ position:absolute; inset:0; background:#c7d8da; border-radius:999px; transition:.2s; cursor:pointer; }
+  .slider::before{ content:""; position:absolute; height:24px; width:24px; left:4px; top:4px; background:#fff; border-radius:50%; transition:.2s; box-shadow:0 1px 3px rgba(0,0,0,.25); }
   input:checked + .slider{ background:var(--amber); }
   input:checked + .slider::before{ transform:translateX(26px); }
   .maint-live{ font-size:13px; font-weight:700; color:var(--amber); display:none; margin-top:6px; }
   body.maint-on .maint-live{ display:block; }
 
-  /* Boxes */
-  .box{ background:#fff; border:1px solid var(--line); border-radius:14px; padding:18px 20px; margin-bottom:14px; }
-  .box .row{ display:grid; grid-template-columns:1fr 150px; gap:12px; }
-  @media(max-width:520px){ .box .row{ grid-template-columns:1fr; } }
-  label{ display:block; font-size:12px; font-weight:700; color:var(--muted); margin:10px 0 4px; }
-  input[type=text], textarea{ width:100%; font:inherit; padding:.55em .7em; border:1px solid var(--line); border-radius:9px; background:#fff9fb; }
-  input:focus, textarea:focus{ outline:none; border-color:var(--rose); box-shadow:0 0 0 3px rgba(201,79,124,.2); background:#fff; }
+  label{ display:block; font-size:12px; font-weight:700; color:var(--ink-soft); margin:10px 0 4px; text-transform:uppercase; letter-spacing:.05em; }
+  input[type=text], textarea{ width:100%; font:inherit; padding:.6em .75em; border:1px solid var(--line); border-radius:10px; background:var(--cream); }
+  input:focus, textarea:focus{ outline:none; border-color:var(--teal); box-shadow:0 0 0 3px rgba(43,143,155,.2); background:#fff; }
   textarea{ resize:vertical; }
+  .hint{ font-size:11px; color:var(--ink-soft); font-weight:500; text-transform:none; letter-spacing:0; margin-top:4px; }
+  .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media(max-width:520px){ .grid2, .box .row{ grid-template-columns:1fr; } }
+
+  .box .row{ display:grid; grid-template-columns:1fr 150px; gap:12px; }
   .box-thumb{ float:right; width:54px; height:54px; border-radius:10px; object-fit:cover; margin:0 0 6px 12px; border:1px solid var(--line); }
 
   .bar{ position:sticky; bottom:0; margin-top:22px; display:flex; align-items:center; gap:16px;
-    background:#fff; border:1px solid var(--line); border-radius:14px; padding:14px 18px; box-shadow:0 -6px 24px rgba(201,79,124,.1); }
+    background:#fff; border:1px solid var(--line); border-radius:16px; padding:14px 18px; box-shadow:0 -6px 24px rgba(31,60,64,.08); }
   .bar .sp{ flex:1; }
   .status{ font-size:14px; font-weight:600; } .status.ok{ color:var(--green); } .status.err{ color:#b42318; }
-  .save{ font:inherit; font-weight:800; padding:11px 26px; border:none; border-radius:999px; background:var(--rose); color:#fff; cursor:pointer; }
-  .save:hover{ background:var(--rose-d); } .save:disabled{ opacity:.6; cursor:not-allowed; }
-  .note{ font-size:13px; color:var(--muted); margin:6px 2px 0; }
+  .save{ font:inherit; font-weight:700; padding:12px 28px; border:none; border-radius:40px; background:var(--teal); color:#fff; cursor:pointer; }
+  .save:hover{ background:var(--teal-dk); } .save:disabled{ opacity:.6; cursor:not-allowed; }
+  .note{ font-size:13px; color:var(--ink-soft); margin:6px 2px 0; }
 </style>
 </head>
 <body>
   <header>
-    <span class="brand">🌸 Louise's Florist</span>
-    <span style="font-size:13px;opacity:.85;">Admin</span>
+    <img src="/images/louises-florist-logo-badge.png" alt="" onerror="this.remove()" />
+    <span class="brand">Louise's <span class="r">Florist</span></span>
+    <span class="tag">Admin</span>
     <span class="sp"></span>
     <a href="/" target="_blank">View site ↗</a>
     <button id="logout">Log out</button>
@@ -65,14 +72,30 @@
 
   <div class="wrap">
     <h2>Maintenance mode</h2>
-    <div class="maint">
+    <div class="card maint">
       <div class="txt">
         <b>Show a "back soon" page to visitors</b>
-        <span>Turn on while you're updating things. You'll still see the real site; visitors see a friendly holding page.</span>
-        <div class="maint-live">● LIVE: visitors currently see the "back soon" page.</div>
+        <span>Turn on while you're updating things. You'll still see the real site; visitors see the holding page.</span>
+        <div class="maint-live">● LIVE: visitors currently see the holding page.</div>
       </div>
       <span class="sp"></span>
       <label class="switch"><input type="checkbox" id="maint"><span class="slider"></span></label>
+    </div>
+
+    <h2>Contact details</h2>
+    <div class="card">
+      <div class="grid2">
+        <div>
+          <label>WhatsApp number</label>
+          <input type="text" id="wa" maxlength="20">
+          <div class="hint">International format, digits only, no "+". e.g. 447930318018</div>
+        </div>
+        <div>
+          <label>Phone number</label>
+          <input type="text" id="phone" maxlength="30">
+          <div class="hint">As shown on the site. e.g. 01992 479794</div>
+        </div>
+      </div>
     </div>
 
     <h2>Bouquet boxes</h2>
@@ -87,13 +110,13 @@
   </div>
 
 <script>
-  const boxesEl=document.getElementById('boxes'), statusEl=document.getElementById('status'),
-        saveBtn=document.getElementById('save'), maintEl=document.getElementById('maint');
-  let data={ boxes:[], maintenance:false };
+  const boxesEl=document.getElementById('boxes'), statusEl=document.getElementById('status'), saveBtn=document.getElementById('save'),
+        maintEl=document.getElementById('maint'), waEl=document.getElementById('wa'), phoneEl=document.getElementById('phone');
+  let data={ boxes:[], contact:{}, maintenance:false };
   const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
   function boxCard(b){
-    return `<div class="box" data-id="${b.id}">
+    return `<div class="card box" data-id="${b.id}">
       ${b.img?`<img class="box-thumb" src="/${esc(b.img)}" alt="" onerror="this.remove()">`:''}
       <label>Title</label>
       <input type="text" data-f="title" value="${esc(b.title)}" maxlength="80">
@@ -111,6 +134,8 @@
     const r=await fetch('/api/admin/content'); if(r.status===401){ location.href='/admin'; return; }
     data=await r.json();
     boxesEl.innerHTML=data.boxes.map(boxCard).join('');
+    waEl.value=(data.contact&&data.contact.whatsapp)||'';
+    phoneEl.value=(data.contact&&data.contact.phone)||'';
     maintEl.checked=!!data.maintenance;
     document.body.classList.toggle('maint-on', maintEl.checked);
     document.querySelectorAll('input,textarea').forEach(i=>i.addEventListener('input',()=>flash('')));
@@ -122,9 +147,10 @@
       const g=f=>el.querySelector(`[data-f="${f}"]`).value;
       return { id:el.dataset.id, title:g('title'), price:g('price'), tag:g('tag'), desc:g('desc') };
     });
+    const contact={ whatsapp:waEl.value, phone:phoneEl.value };
     saveBtn.disabled=true; const t=saveBtn.textContent; saveBtn.textContent='Saving…';
     try{
-      const r=await fetch('/api/admin/content',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({boxes,maintenance:maintEl.checked})});
+      const r=await fetch('/api/admin/content',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({boxes,contact,maintenance:maintEl.checked})});
       if(r.status===401){ location.href='/admin'; return; }
       const d=await r.json().catch(()=>({}));
       if(r.ok){ data=d; flash('Saved — live on the site.',true); }
