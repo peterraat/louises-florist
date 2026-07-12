@@ -162,7 +162,7 @@ const loginLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 10, standardHead
 
 app.post("/api/login", loginLimiter, (req, res) => {
   if (!ADMIN_PASSWORD || !AUTH_SECRET) return res.status(503).json({ error: "Admin not configured" });
-  const { password, totp } = req.body || {};
+  const { password, totp, trust } = req.body || {};
   if (!password || !safeEqual(password, ADMIN_PASSWORD)) return res.status(401).json({ error: "Invalid password" });
   if (TOTP_ENABLED) {
     const code = String(totp || "").replace(/\s+/g, "");
@@ -170,7 +170,8 @@ app.post("/api/login", loginLimiter, (req, res) => {
     try { ok = code.length === 6 && authenticator.check(code, TOTP_SECRET); } catch (_) { ok = false; }
     if (!ok) return res.status(401).json({ error: "Invalid authenticator code", totp: true });
   }
-  res.cookie(ADMIN_COOKIE, signToken(Date.now() + 8 * 60 * 60 * 1000), { httpOnly: true, sameSite: "lax", secure: req.secure, maxAge: 8 * 60 * 60 * 1000 });
+  const ttl = trust ? 30 * 24 * 60 * 60 * 1000 : 8 * 60 * 60 * 1000; // 30 days if trusted, else 8h
+  res.cookie(ADMIN_COOKIE, signToken(Date.now() + ttl), { httpOnly: true, sameSite: "lax", secure: req.secure, maxAge: ttl });
   res.json({ ok: true });
 });
 app.post("/api/logout", (req, res) => { res.clearCookie(ADMIN_COOKIE); res.json({ ok: true }); });
