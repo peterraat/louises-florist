@@ -50,7 +50,7 @@ jobs:
           fi
           git commit -m "Automated DB backup $(date -u +%Y-%m-%d)"
           if ! out=$(git push origin HEAD:main 2>&1); then
-            echo "::error::GITHUB PUSH FAILED: $out"
+            echo "::error::GITHUB PUSH FAILED: ${out//$'\n'/ || }"
             exit 1
           fi
           # Push straight to GitLab too. (Commits pushed with GITHUB_TOKEN don't
