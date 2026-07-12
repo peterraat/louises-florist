@@ -33,6 +33,13 @@ const DEFAULT_CONTENT = {
     { id: "s3", title: "Occasions & Celebrations", desc: "Birthdays, anniversaries, new baby or \"just because\" — hand-tied bouquets to make someone smile." },
     { id: "s4", title: "Corporate & Events",       desc: "Regular displays, event flowers and seasonal arrangements for local businesses." }
   ],
+  occasions: [
+    { id: "o1", icon: "💍", name: "Weddings" },
+    { id: "o2", icon: "🕊️", name: "Funerals" },
+    { id: "o3", icon: "❤️", name: "Valentine's" },
+    { id: "o4", icon: "💐", name: "Mother's Day" },
+    { id: "o5", icon: "🥂", name: "Anniversaries" }
+  ],
   gallery: [
     { id: "gal1", caption: "Hand-tied bouquets", img: "images/g1.jpg" },
     { id: "gal2", caption: "Seasonal blooms",    img: "images/g2.jpg" },
@@ -78,6 +85,7 @@ function mergeContent(def, s) {
   return {
     hero: { ...def.hero, ...(s.hero || {}) },
     services: (Array.isArray(s.services) && s.services.length) ? s.services : def.services,
+    occasions: (Array.isArray(s.occasions) && s.occasions.length) ? s.occasions : def.occasions,
     gallery: (Array.isArray(s.gallery) && s.gallery.length) ? s.gallery : def.gallery,
     boxes: (Array.isArray(s.boxes) && s.boxes.length) ? s.boxes : def.boxes,
     contact: { ...def.contact, ...(s.contact || {}),
@@ -151,7 +159,7 @@ function requireAuth(req, res, next) { return isAdmin(req) ? next() : res.status
 /* ===================== PUBLIC API ===================== */
 app.get("/api/content", (req, res) => {
   res.set("Cache-Control", "no-store");
-  res.json({ hero: content.hero, services: content.services, gallery: content.gallery, boxes: content.boxes, contact: content.contact });
+  res.json({ hero: content.hero, services: content.services, occasions: content.occasions, gallery: content.gallery, boxes: content.boxes, contact: content.contact });
 });
 app.get("/api/login-config", (req, res) => res.json({ totp: TOTP_ENABLED }));
 app.get("/api/me", (req, res) => res.json({ admin: isAdmin(req) }));  // for inline editing on the live site
@@ -207,6 +215,10 @@ app.post("/api/admin/content", requireAuth, async (req, res) => {
       const inp = (body.services || []).find((x) => x && x.id === s.id);
       return { ...s, title: pick(inp, s.title, "title", 60), desc: pick(inp, s.desc, "desc", 240) };
     });
+    const occasions = content.occasions.map((o) => {
+      const inp = (body.occasions || []).find((x) => x && x.id === o.id);
+      return { ...o, name: pick(inp, o.name, "name", 40), icon: pick(inp, o.icon, "icon", 12) };
+    });
     const gallery = content.gallery.map((g) => {
       const inp = (body.gallery || []).find((x) => x && x.id === g.id);
       return { ...g, caption: pick(inp, g.caption, "caption", 60), img: pick(inp, g.img, "img", 300) };
@@ -234,7 +246,7 @@ app.post("/api/admin/content", requireAuth, async (req, res) => {
     };
     const maintenance = body.maintenance === undefined ? content.maintenance : !!body.maintenance;
 
-    const next = { hero, services, gallery, boxes, contact: contactNew, maintenance };
+    const next = { hero, services, occasions, gallery, boxes, contact: contactNew, maintenance };
     await Content.findByIdAndUpdate("singleton", { data: next, updatedAt: new Date() }, { upsert: true });
     content = next;
     res.json({ ok: true, ...next });

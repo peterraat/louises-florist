@@ -8,7 +8,7 @@
 
   fetch("/api/me").then(function (r) { return r.json(); }).then(function (m) {
     isAdmin = !!(m && m.admin);
-    if (isAdmin) { injectStyles(); buildImageModal(); document.body.classList.add("lf-admin"); showBar(); showSignout(); if (ready) wire(); }
+    if (isAdmin) { injectStyles(); buildImageModal(); buildIconModal(); document.body.classList.add("lf-admin"); showBar(); showSignout(); if (ready) wire(); }
   }).catch(function () {});
 
   window.LFInlineEdit = function () { ready = true; if (isAdmin) wire(); };
@@ -16,13 +16,25 @@
   function wire() { if (wired) return; wired = true; document.addEventListener("click", onClick, true); }
 
   function onClick(e) {
+    var iconEl = e.target.closest("[data-editicon]");
+    if (iconEl) { e.preventDefault(); e.stopPropagation(); openIconPicker(iconEl); return; }
     var imgEl = e.target.closest("[data-editimg]");
     if (imgEl) { e.preventDefault(); e.stopPropagation(); openImageEditor(imgEl); return; }
     var el = e.target.closest("[data-edit]");
-    if (!el || el === active) return;
-    e.preventDefault(); e.stopPropagation();
-    if (active) return;
-    start(el);
+    if (el) {
+      if (el === active || active) return;
+      e.preventDefault(); e.stopPropagation();
+      start(el);
+      return;
+    }
+    // Fallback: on gallery tiles the gradient overlay (.tile::after) sits ABOVE the
+    // image, so the click target is the container, not the [data-editimg] photo inside.
+    // Find the image within the nearest photo container so it still opens the editor.
+    var container = e.target.closest(".tile, .shop-img, .hero, .hero-in");
+    if (container) {
+      var cim = container.querySelector("[data-editimg]");
+      if (cim) { e.preventDefault(); e.stopPropagation(); openImageEditor(cim); return; }
+    }
   }
 
   function start(el) {
@@ -83,6 +95,7 @@
     if (p[0] === "service") { var b = { id: p[1] }; b[p[2]] = val; return { services: [b] }; }
     if (p[0] === "box")     { var c = { id: p[1] }; c[p[2]] = val; return { boxes: [c] }; }
     if (p[0] === "gallery") { var e = { id: p[1] }; e[p[2]] = val; return { gallery: [e] }; }
+    if (p[0] === "occasion") { var o = { id: p[1] }; o[p[2]] = val; return { occasions: [o] }; }
     if (p[0] === "contact" && p[1] === "hours") {
       // hours is an array — gather every row from the page (the edited value is already in the DOM)
       var hours = [];
@@ -173,6 +186,30 @@
     return null;
   }
 
+  /* ---- inline icon picker (occasion icons) ---- */
+  var iconModal = null, iconTarget = null;
+  var EMOJIS = ["💐","🌷","🌹","🌸","🌺","🌻","🌼","🪷","🌿","🍀","💒","💍","🕊️","❤️","💕","💖","💝","💗","🧡","💛","💚","💙","💜","🖤","🤍","🎁","🎉","🎊","🥂","🍾","🎂","🎈","👶","🍼","🎓","🏆","🌟","⭐","✨","👑","💌","🌈","☀️","🌙","🕯️","⚰️","✝️","🙏","🎃","🎄","❄️","🍁"];
+  function buildIconModal() {
+    iconModal = document.createElement("div"); iconModal.className = "lf-modal"; iconModal.hidden = true;
+    iconModal.innerHTML = '<div class="lf-modal-box"><div class="lf-modal-head"><b>Pick an icon</b><button class="lf-close" type="button">✕</button></div><div class="lf-icon-grid">' + EMOJIS.map(function (e) { return '<button class="lf-emoji" type="button">' + e + '</button>'; }).join("") + '</div></div>';
+    document.body.appendChild(iconModal);
+    iconModal.querySelector(".lf-close").addEventListener("click", closeIcon);
+    iconModal.addEventListener("click", function (e) { if (e.target === iconModal) closeIcon(); });
+    iconModal.querySelector(".lf-icon-grid").addEventListener("click", function (e) { var b = e.target.closest(".lf-emoji"); if (b) applyIcon(b.textContent); });
+  }
+  function openIconPicker(el) { iconTarget = el; iconModal.hidden = false; }
+  function closeIcon() { if (iconModal) iconModal.hidden = true; iconTarget = null; }
+  function applyIcon(emoji) {
+    if (!iconTarget) return;
+    var p = iconTarget.getAttribute("data-editicon").split("."); // occasion.<id>.icon
+    iconTarget.textContent = emoji;
+    fetch("/api/admin/content", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ occasions: [{ id: p[1], icon: emoji }] }) })
+      .then(function (r) { if (r.status === 401) { location.href = "/admin"; return null; } return r.json(); })
+      .then(function (d) { if (d && d.ok) toast("Icon updated ✓"); else toast((d && d.error) || "Could not save", true); })
+      .catch(function () { toast("Save failed", true); });
+    closeIcon();
+  }
+
   function injectStyles() {
     var css =
       "body.lf-admin [data-edit]{outline:1px dashed rgba(43,143,155,.55);outline-offset:2px;cursor:text;transition:background .15s;}" +
@@ -206,6 +243,11 @@
       ".lf-confirm-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}" +
       ".lf-yes{background:#2e7d51;color:#fff;border:none;border-radius:999px;padding:11px 22px;font-weight:700;font-size:14px;cursor:pointer;}" +
       ".lf-nope{background:#e2eef0;color:#26383c;border:none;border-radius:999px;padding:11px 22px;font-weight:700;font-size:14px;cursor:pointer;}" +
+      "body.lf-admin [data-editicon]{outline:1px dashed rgba(43,143,155,.5);outline-offset:3px;cursor:pointer;border-radius:6px;}" +
+      "body.lf-admin [data-editicon]:hover{background:rgba(43,143,155,.12);}" +
+      ".lf-icon-grid{overflow-y:auto;padding:16px;display:grid;grid-template-columns:repeat(8,1fr);gap:6px;}" +
+      ".lf-emoji{font-size:24px;line-height:1;cursor:pointer;padding:8px 4px;border:none;background:none;border-radius:8px;}" +
+      ".lf-emoji:hover{background:#e2eef0;}" +
       "body.lf-admin{padding-bottom:46px;}";
     var s = document.createElement("style"); s.textContent = css; document.head.appendChild(s);
   }
