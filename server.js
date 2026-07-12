@@ -146,6 +146,18 @@ cloudinary.config({
 const cloudinaryReady = Boolean(process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET);
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
 
+// MailerSend — the enquiry form emails the shop via MailerSend's HTTP API, so
+// Render's SMTP port blocks don't matter. Configure with env vars below.
+const MAILERSEND_API_KEY = (process.env.MAILERSEND_API_KEY || "").trim();
+const ENQUIRY_TO = (process.env.ENQUIRY_TO || "").trim();          // where enquiries land (Louise's inbox)
+const ENQUIRY_FROM = (process.env.ENQUIRY_FROM || "").trim();      // a verified MailerSend sender address
+const ENQUIRY_FROM_NAME = (process.env.ENQUIRY_FROM_NAME || "Website enquiry").trim();
+const mailReady = Boolean(MAILERSEND_API_KEY && ENQUIRY_TO && ENQUIRY_FROM);
+
+function escapeHtml(s) {
+  return String(s == null ? "" : s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+}
+
 function safeEqual(a, b) {
   const ab = Buffer.from(String(a)), bb = Buffer.from(String(b));
   return ab.length === bb.length && crypto.timingSafeEqual(ab, bb);
@@ -179,6 +191,49 @@ app.get("/api/content", (req, res) => {
 app.get("/api/login-config", (req, res) => res.json({ totp: TOTP_ENABLED }));
 app.get("/api/me", (req, res) => res.json({ admin: isAdmin(req) }));  // for inline editing on the live site
 app.get("/healthz", (req, res) => res.json({ ok: true }));
+
+// Enquiry/contact form -> emails the shop via MailerSend.
+const enquiryLimiter = rateLimit({ windowMs: 10 * 60 * 1000, max: 5, standardHeaders: true, legacyHeaders: false, validate: false, message: { error: "Too many enquiries — please try again shortly, or call the shop." } });
+app.post("/api/enquiry", enquiryLimiter, async (req, res) => {
+  const b = req.body || {};
+  if (b.website) return res.json({ ok: true });   // honeypot: bots fill this hidden field — silently accept
+  const clean = (s, max) => String(s == null ? "" : s).trim().slice(0, max);
+  const name = clean(b.name, 100), phone = clean(b.phone, 40), email = clean(b.email, 120),
+        occasion = clean(b.occasion, 60), date = clean(b.date, 40), message = clean(b.message, 2000);
+  if (!name || (!phone && !email)) return res.status(400).json({ error: "Please add your name and a phone number or email." });
+  if (!mailReady) return res.status(503).json({ error: "The enquiry form isn't set up yet — please call the shop." });
+
+  const rows = [
+    ["Name", name], ["Phone", phone || "—"], ["Email", email || "—"],
+    ["Occasion", occasion || "—"], ["Date needed", date || "—"]
+  ];
+  const text = "New enquiry from the website:\n\n" + rows.map(([k, v]) => `${k}: ${v}`).join("\n") + `\n\nMessage:\n${message || "—"}`;
+  const html = "<h2>New enquiry from the website</h2>" +
+    "<table>" + rows.map(([k, v]) => `<tr><td><b>${escapeHtml(k)}:</b></td><td>${escapeHtml(v)}</td></tr>`).join("") + "</table>" +
+    `<p><b>Message:</b><br>${escapeHtml(message || "—").replace(/\n/g, "<br>")}</p>`;
+
+  const payload = {
+    from: { email: ENQUIRY_FROM, name: ENQUIRY_FROM_NAME },
+    to: [{ email: ENQUIRY_TO }],
+    subject: `New enquiry from ${name}${occasion ? " — " + occasion : ""}`,
+    text, html
+  };
+  if (email && /.+@.+\..+/.test(email)) payload.reply_to = { email, name };   // so Louise can just hit Reply
+
+  try {
+    const r = await fetch("https://api.mailersend.com/v1/email", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${MAILERSEND_API_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    if (r.ok || r.status === 202) return res.json({ ok: true });
+    console.error("MailerSend error", r.status, await r.text().catch(() => ""));
+    return res.status(502).json({ error: "Couldn't send right now — please call the shop." });
+  } catch (err) {
+    console.error("MailerSend request failed:", err.message);
+    return res.status(502).json({ error: "Couldn't send right now — please call the shop." });
+  }
+});
 
 /* ===================== AUTH ===================== */
 const loginLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 10, standardHeaders: true, legacyHeaders: false, validate: false, message: { error: "Too many attempts — please wait a few minutes." } });

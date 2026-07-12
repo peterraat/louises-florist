@@ -462,8 +462,10 @@
           <label>Date needed<input name="date" type="date"></label>
         </div>
         <label>Details<textarea name="message" rows="4" placeholder="Colours, favourite flowers, budget, delivery address…"></textarea></label>
+        <input type="text" name="website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" aria-hidden="true">
         <button class="btn btn-primary" type="submit">Send enquiry</button>
         <div class="order-ok" id="orderOk" style="display:none">✿ Thank you! Your enquiry has been sent — Louise will be in touch very soon.</div>
+        <div class="order-err" id="orderErr" style="display:none;color:#b42318;font-weight:600;margin-top:8px">Sorry — something went wrong sending that. Please call the shop on <a href="tel:01992479794">01992 479794</a>.</div>
       </form>
     </div>
   </div>
@@ -616,8 +618,22 @@
   function sendEnquiry(e){
     e.preventDefault();
     var form = e.target;
-    Array.prototype.forEach.call(form.children, function(c){ if (c.id !== 'orderOk') c.style.display = 'none'; });
-    document.getElementById('orderOk').style.display = 'block';
+    var btn = form.querySelector('button[type=submit]');
+    var okEl = document.getElementById('orderOk'), errEl = document.getElementById('orderErr');
+    if(errEl) errEl.style.display='none';
+    var data = {};
+    Array.prototype.forEach.call(form.querySelectorAll('input,select,textarea'), function(el){ if(el.name) data[el.name]=el.value; });
+    var origLabel = btn ? btn.textContent : '';
+    if(btn){ btn.disabled=true; btn.textContent='Sending…'; }
+    fetch('/api/enquiry',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)})
+      .then(function(r){ return r.json().catch(function(){return {};}).then(function(d){ return {ok:r.ok, d:d}; }); })
+      .then(function(res){
+        if(res.ok){
+          Array.prototype.forEach.call(form.children, function(c){ if(c.id!=='orderOk' && c.id!=='orderErr') c.style.display='none'; });
+          okEl.style.display='block';
+        } else { throw new Error((res.d && res.d.error) || 'failed'); }
+      })
+      .catch(function(){ if(btn){ btn.disabled=false; btn.textContent=origLabel; } if(errEl) errEl.style.display='block'; });
     return false;
   }
 

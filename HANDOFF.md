@@ -143,6 +143,20 @@ Cloudinary is only enabled when all three Cloudinary vars are present.
   because those have no overlay). `onClick` now falls back to finding the `[data-editimg]` image
   inside the nearest `.tile`/`.shop-img`/`.hero` container.
 
+## Enquiry form → email (MailerSend)
+
+The order/enquiry form posts to `POST /api/enquiry`, which emails the shop via **MailerSend's
+HTTP API** (not SMTP — avoids Render's port blocks). Honeypot + rate-limited (5 / 10 min). The
+customer's email is set as `reply_to` so Louise can just hit Reply.
+
+Needs these env vars on Render (form degrades gracefully to "please call the shop" if unset):
+- `MAILERSEND_API_KEY` — MailerSend API token
+- `ENQUIRY_TO` — where enquiries land (Louise's inbox / Gmail)
+- `ENQUIRY_FROM` — a **verified** MailerSend sender address
+- `ENQUIRY_FROM_NAME` — display name (optional)
+
+Reusable across sites — this is part of the template engine.
+
 ## Still to do
 
 1. **Add occasions to the admin panel** — they're currently editable inline on the live site only;
