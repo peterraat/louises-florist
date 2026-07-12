@@ -177,7 +177,7 @@
   .shop-body h3{font-size:24px;margin-bottom:4px}
   .shop-body p{font-size:13px;color:var(--ink-soft);margin-bottom:14px;flex:1}
   .shop-price{font-family:'Montserrat',sans-serif;font-size:20px;color:var(--rose-dk);font-weight:700;letter-spacing:-.01em;margin-bottom:16px}
-  .shop-price span{font-size:12px;color:var(--ink-soft);font-family:'Montserrat',sans-serif;font-weight:400}
+  .shop-price .shop-tag{font-size:12px;color:var(--ink-soft);font-family:'Montserrat',sans-serif;font-weight:400}
   .shop-card .btn{justify-content:center}
   .shop-note{text-align:center;margin-top:26px;font-size:12px;color:var(--ink-soft)}
 
@@ -539,7 +539,7 @@
         d.boxes.forEach(function(b,i){ var card=cards[i]; if(!card) return;
           set(card.querySelector('h3'),b.title,'box.'+b.id+'.title');
           set(card.querySelector('.shop-body p'),b.desc,'box.'+b.id+'.desc',true);
-          var price=card.querySelector('.shop-price'); if(price) price.innerHTML=esc(b.price)+(b.tag?' <span>· '+esc(b.tag)+'</span>':''); });
+          var price=card.querySelector('.shop-price'); if(price) price.innerHTML='<span data-edit="box.'+b.id+'.price">'+esc(b.price)+'</span>'+(b.tag?' <span class="shop-tag">· <span data-edit="box.'+b.id+'.tag">'+esc(b.tag)+'</span></span>':''); });
       }
       // Gallery captions (6)
       if(Array.isArray(d.gallery)){
