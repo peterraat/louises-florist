@@ -65,12 +65,17 @@
   @media(max-width:560px){ #social .soc-row{ grid-template-columns:1fr; gap:6px; } }
 
   /* Photo upload control */
-  .photo{ float:right; text-align:center; margin:0 0 8px 14px; }
-  .thumb{ width:72px; height:72px; border-radius:10px; object-fit:cover; border:1px solid var(--line); display:block; background:var(--cream-2); }
+  .photo{ float:right; text-align:center; margin:0 0 10px 16px; }
+  .thumb{ width:225px; height:225px; border-radius:12px; object-fit:cover; border:1px solid var(--line); display:block; background:var(--cream-2); }
   .thumb.noimg{ visibility:hidden; }
-  .photo-btns{ display:flex; gap:10px; justify-content:center; margin-top:5px; }
-  .up-btn, .pick-btn{ font-size:11px; font-weight:700; color:var(--teal); cursor:pointer; }
-  .up-btn:hover, .pick-btn:hover{ text-decoration:underline; }
+  /* Hero photo is full-width on the live site — give it a wider preview */
+  #hero-card .thumb{ width:315px; height:225px; }
+  /* Upload + Library sit side by side, filling the width under the preview */
+  .photo-btns{ display:flex; gap:8px; margin-top:8px; }
+  .up-btn, .pick-btn{ flex:1; text-align:center; font-size:12px; font-weight:700; color:var(--teal); cursor:pointer;
+    background:var(--cream-2); border-radius:8px; padding:7px 8px; white-space:nowrap; }
+  .up-btn:hover, .pick-btn:hover{ background:var(--line); text-decoration:none; }
+  @media(max-width:560px){ .photo{ float:none; margin:0 0 10px; } .thumb, #hero-card .thumb{ width:100%; height:190px; } }
   /* photo library modal */
   .modal{ position:fixed; inset:0; z-index:100; background:rgba(38,56,60,.6); display:flex; align-items:center; justify-content:center; padding:20px; }
   .modal[hidden]{ display:none; }
