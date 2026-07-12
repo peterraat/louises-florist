@@ -83,6 +83,15 @@
     if (p[0] === "service") { var b = { id: p[1] }; b[p[2]] = val; return { services: [b] }; }
     if (p[0] === "box")     { var c = { id: p[1] }; c[p[2]] = val; return { boxes: [c] }; }
     if (p[0] === "gallery") { var e = { id: p[1] }; e[p[2]] = val; return { gallery: [e] }; }
+    if (p[0] === "contact" && p[1] === "hours") {
+      // hours is an array — gather every row from the page (the edited value is already in the DOM)
+      var hours = [];
+      document.querySelectorAll("#contact .hours > div").forEach(function (row) {
+        var b = row.querySelector("b"), s = row.querySelector("span");
+        hours.push({ day: b ? b.textContent.trim() : "", time: s ? s.textContent.trim() : "" });
+      });
+      return { contact: { hours: hours } };
+    }
     if (p[0] === "contact") { var f = {}; f[p[1]] = val; return { contact: f }; }
     return null;
   }
