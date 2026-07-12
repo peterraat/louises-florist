@@ -8,7 +8,7 @@
 
   fetch("/api/me").then(function (r) { return r.json(); }).then(function (m) {
     isAdmin = !!(m && m.admin);
-    if (isAdmin) { injectStyles(); document.body.classList.add("lf-admin"); showBar(); if (ready) wire(); }
+    if (isAdmin) { injectStyles(); document.body.classList.add("lf-admin"); showBar(); showSignout(); if (ready) wire(); }
   }).catch(function () {});
 
   window.LFInlineEdit = function () { ready = true; if (isAdmin) wire(); };
@@ -94,6 +94,11 @@
     b.innerHTML = '✏️ Editing mode — click any highlighted text to change it. <a href="/admin">Full admin ↗</a>';
     document.body.appendChild(b);
   }
+  function showSignout() {
+    var b = document.createElement("button"); b.className = "lf-signout"; b.type = "button"; b.textContent = "Sign out";
+    b.addEventListener("click", function () { fetch("/api/logout", { method: "POST" }).then(function () { location.reload(); }); });
+    document.body.appendChild(b);
+  }
   function toast(msg, err) {
     var t = document.createElement("div"); t.className = "lf-toast" + (err ? " err" : ""); t.textContent = msg;
     document.body.appendChild(t); setTimeout(function () { t.remove(); }, 1800);
@@ -110,6 +115,8 @@
       ".lf-bar a{color:#fff;text-decoration:underline;margin-left:6px;}" +
       ".lf-toast{position:fixed;bottom:58px;left:50%;transform:translateX(-50%);z-index:99999;background:#2e7d51;color:#fff;padding:10px 18px;border-radius:999px;font:600 14px Montserrat,system-ui,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.25);}" +
       ".lf-toast.err{background:#b42318;}" +
+      ".lf-signout{position:fixed;top:12px;right:12px;z-index:99999;background:#b42318;color:#fff;border:none;border-radius:8px;padding:8px 14px;font:600 13px Montserrat,system-ui,sans-serif;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.3);}" +
+      ".lf-signout:hover{background:#8f1c12;}" +
       "body.lf-admin{padding-bottom:46px;}";
     var s = document.createElement("style"); s.textContent = css; document.head.appendChild(s);
   }
