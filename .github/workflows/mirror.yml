@@ -25,6 +25,9 @@ jobs:
         run: |
           # strip any accidental spaces/newlines the token may have picked up
           TOKEN="$(printf '%s' "$GITLAB_TOKEN" | tr -d '[:space:]')"
+          # SAFE diagnostic: prints length + first 5 chars only (never the full token)
+          echo "TOKEN LENGTH: ${#TOKEN}"
+          echo "TOKEN STARTS WITH: ${TOKEN:0:5}"
           REMOTE="https://oauth2:${TOKEN}@gitlab.com/lifeswonderful/louises-florist-backup.git"
           # HEAD:refs/heads/main works whether or not the branch is checked out
           git push --force "$REMOTE" "HEAD:refs/heads/main"
