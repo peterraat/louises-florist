@@ -74,6 +74,22 @@ FB /Louisesfloristhoddesdon.
 - Maintenance middleware serves the holding page to visitors when `maintenance` is on, but exempts
   the holding image and the logo badge.
 
+## Database: one database per site + daily content backup
+
+- Louise's content lives in its **own** MongoDB database named **`louisesflorist`** (the
+  `MONGODB_URI` path ends in `/louisesflorist`). It was originally sharing the `dividend-sniper`
+  database — migrated out on 2026-07-12 so each site has its own database. **Rule for every new
+  site: give it its own database name in the connection string** (Mongo auto-creates it on first
+  write); never share one database between sites.
+- All sites currently share **one free Atlas M0 cluster** (512 MB total, no built-in backups).
+  Many small databases fit fine; watch the 512 MB ceiling as sites are added.
+- **Daily backup** (`.github/workflows/backup.yml` + `scripts/backup-db.mjs`): once a day it dumps
+  every collection to `backups/<db>/<collection>.json`, commits it (git history = restore points),
+  and pushes the snapshot to GitLab too. Free. Needs `MONGODB_URI` + `GITLAB_TOKEN` secrets.
+  Collections over 90 MB are skipped (git can't hold big data — that needs a different strategy).
+- **Restore**: `MONGODB_URI="…" CONFIRM_RESTORE=yes node scripts/restore-db.mjs` (to roll back to an
+  older day, first `git checkout <commit> -- backups/` then run it).
+
 ## Automatic GitHub → GitLab backup (mirror)
 
 Every push to GitHub auto-copies the whole repo to a **GitLab** backup, via
