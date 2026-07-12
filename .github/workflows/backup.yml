@@ -49,8 +49,14 @@ jobs:
             exit 0
           fi
           git commit -m "Automated DB backup $(date -u +%Y-%m-%d)"
-          git push origin HEAD:main
+          if ! out=$(git push origin HEAD:main 2>&1); then
+            echo "::error::GITHUB PUSH FAILED: $out"
+            exit 1
+          fi
           # Push straight to GitLab too. (Commits pushed with GITHUB_TOKEN don't
           # trigger the mirror workflow, so we mirror this snapshot explicitly.)
           TOKEN="$(printf '%s' "$GITLAB_TOKEN" | tr -d '[:space:]')"
-          git push --force "https://oauth2:${TOKEN}@gitlab.com/lifeswonderful/louises-florist-backup.git" HEAD:refs/heads/main
+          if ! out=$(git push --force "https://oauth2:${TOKEN}@gitlab.com/lifeswonderful/louises-florist-backup.git" HEAD:refs/heads/main 2>&1); then
+            echo "::error::GITLAB PUSH FAILED: ${out//$TOKEN/***}"
+            exit 1
+          fi
