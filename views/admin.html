@@ -28,11 +28,14 @@
   .card{ background:#fff; border:1px solid var(--line); border-radius:16px; padding:18px 20px; margin-bottom:14px; }
 
   /* Card grids mirror the live page layout */
-  #boxes, #gallery{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+  #boxes, #gallery, #occasions{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
   #services{ display:grid; grid-template-columns:repeat(2,1fr); gap:14px; }
-  #boxes .card, #gallery .card, #services .card{ margin-bottom:0; }
-  @media(max-width:820px){ #boxes, #gallery, #services{ grid-template-columns:repeat(2,1fr); } }
-  @media(max-width:560px){ #boxes, #gallery, #services, .grid2{ grid-template-columns:1fr; } }
+  #boxes .card, #gallery .card, #services .card, #occasions .card{ margin-bottom:0; }
+  @media(max-width:820px){ #boxes, #gallery, #services, #occasions{ grid-template-columns:repeat(2,1fr); } }
+  @media(max-width:560px){ #boxes, #gallery, #services, #occasions, .grid2{ grid-template-columns:1fr; } }
+  /* Occasion card: big emoji + name */
+  .occ .occ-emoji{ width:100%; font-size:26px; text-align:center; padding:.35em; }
+  .occ .occ-emoji:focus{ outline:none; border-color:var(--teal); box-shadow:0 0 0 3px rgba(43,143,155,.2); background:#fff; }
 
   /* Maintenance toggle: green = live, red = holding page */
   .maint{ display:flex; align-items:center; gap:16px; }
@@ -144,13 +147,16 @@
     <h2>② Services — "Flowers for every moment"</h2>
     <div id="services"></div>
 
-    <h2>③ Gallery — "A little inspiration"</h2>
+    <h2>③ The moment — occasion icons</h2>
+    <div id="occasions"></div>
+
+    <h2>④ Gallery — "A little inspiration"</h2>
     <div id="gallery"></div>
 
-    <h2>④ Shop boxes — "Order online"</h2>
+    <h2>⑤ Shop boxes — "Order online"</h2>
     <div id="boxes"></div>
 
-    <h2>⑤ Contact &amp; hours — "Visit the shop"</h2>
+    <h2>⑥ Contact &amp; hours — "Visit the shop"</h2>
     <div class="card">
       <div class="grid2">
         <div><label>Shop name</label><input type="text" id="c-name" maxlength="80"></div>
@@ -164,7 +170,7 @@
       <div id="hours"></div>
     </div>
 
-    <h2>⑥ Social media — footer buttons</h2>
+    <h2>⑦ Social media — footer buttons</h2>
     <div class="card">
       <p class="note" style="margin:0 0 14px">Tick a platform and paste its link to show its button at the bottom of the site. Untick to hide it. If none are ticked, no social buttons appear at all.</p>
       <div id="social"></div>
@@ -187,7 +193,7 @@
 <script>
   const $=id=>document.getElementById(id);
   const servicesEl=$('services'), boxesEl=$('boxes'), galleryEl=$('gallery'), hoursEl=$('hours'),
-        socialEl=$('social'), statusEl=$('status'), saveBtn=$('save'), maintEl=$('maint'), heroCard=$('hero-card');
+        occasionsEl=$('occasions'), socialEl=$('social'), statusEl=$('status'), saveBtn=$('save'), maintEl=$('maint'), heroCard=$('hero-card');
   let data={};
   const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const imgSrc=img=>{ img=img||''; return img.indexOf('http')===0?img:(img?'/'+img:''); };
@@ -268,6 +274,12 @@
       <input type="text" data-f="url" value="${esc(p.url)}" maxlength="300" placeholder="${esc(socPlaceholder[p.id]||'https://…')}">
     </div>`;
   }
+  function occasionCard(o){
+    return `<div class="card occ" data-id="${o.id}">
+      <label>Icon (emoji)</label><input type="text" class="occ-emoji" data-f="icon" value="${esc(o.icon)}" maxlength="12">
+      <label>Name</label><input type="text" data-f="name" value="${esc(o.name)}" maxlength="40">
+    </div>`;
+  }
   function hoursRow(h){
     return `<div class="hours-row">
       <input type="text" data-f="day" value="${esc(h.day)}" maxlength="30" placeholder="e.g. Mon – Fri">
@@ -305,6 +317,7 @@
     heroCard.dataset.img=data.hero.img||'';
     var ht=heroCard.querySelector('.thumb'); if(data.hero.img){ ht.src=imgSrc(data.hero.img); ht.classList.remove('noimg'); } else ht.classList.add('noimg');
     servicesEl.innerHTML=data.services.map(serviceCard).join('');
+    occasionsEl.innerHTML=(data.occasions||[]).map(occasionCard).join('');
     galleryEl.innerHTML=data.gallery.map(galCard).join('');
     boxesEl.innerHTML=data.boxes.map(boxCard).join('');
     const c=data.contact||{};
@@ -334,6 +347,7 @@
     const payload={
       hero:{ eyebrow:$('h-eyebrow').value, heading:$('h-heading').value, lede:$('h-lede').value, img:heroCard.dataset.img },
       services: collectList(servicesEl,'.svc',['title','desc']),
+      occasions: collectList(occasionsEl,'.occ',['icon','name']),
       gallery: collectList(galleryEl,'.gal',['caption']),
       boxes: collectList(boxesEl,'.box',['title','price','tag','desc']),
       contact:{

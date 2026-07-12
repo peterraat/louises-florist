@@ -10,6 +10,8 @@ import rateLimit from "express-rate-limit";
 import { v2 as cloudinary } from "cloudinary";
 import multer from "multer";
 
+import siteConfig from "./site.config.js";
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express();
@@ -339,7 +341,7 @@ app.post("/api/admin/upload", requireAuth, upload.single("file"), async (req, re
   try {
     const result = await new Promise((resolve, reject) => {
       const stream = cloudinary.uploader.upload_stream(
-        { folder: "louises-florist", resource_type: "image",
+        { folder: siteConfig.cloudinaryFolder, resource_type: "image",
           transformation: [{ width: 1400, height: 1400, crop: "limit" }, { quality: "auto", fetch_format: "auto" }] },
         (err, r) => (err ? reject(err) : resolve(r))
       );
@@ -355,7 +357,7 @@ app.post("/api/admin/upload", requireAuth, upload.single("file"), async (req, re
 app.get("/api/admin/media", requireAuth, async (req, res) => {
   if (!cloudinaryReady) return res.status(503).json({ error: "Image uploads aren't configured yet" });
   try {
-    const result = await cloudinary.api.resources({ type: "upload", prefix: "louises-florist/", max_results: 200 });
+    const result = await cloudinary.api.resources({ type: "upload", prefix: siteConfig.cloudinaryFolder + "/", max_results: 200 });
     const images = (result.resources || [])
       .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
       .map((r) => ({ url: r.secure_url, id: r.public_id }));
@@ -369,7 +371,7 @@ app.get("/api/admin/media", requireAuth, async (req, res) => {
 app.post("/api/admin/media/delete", requireAuth, async (req, res) => {
   if (!cloudinaryReady) return res.status(503).json({ error: "Image uploads aren't configured yet" });
   const id = (req.body && req.body.id) || "";
-  if (!id || id.indexOf("louises-florist/") !== 0) return res.status(400).json({ error: "Invalid image" });
+  if (!id || id.indexOf(siteConfig.cloudinaryFolder + "/") !== 0) return res.status(400).json({ error: "Invalid image" });
   try {
     const r = await cloudinary.uploader.destroy(id);
     res.json({ ok: r.result === "ok" || r.result === "not found", result: r.result });
