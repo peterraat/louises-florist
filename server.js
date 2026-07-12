@@ -7,6 +7,8 @@ import mongoose from "mongoose";
 import { authenticator } from "otplib";
 import QRCode from "qrcode";
 import rateLimit from "express-rate-limit";
+import { v2 as cloudinary } from "cloudinary";
+import multer from "multer";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -22,7 +24,8 @@ const DEFAULT_CONTENT = {
   hero: {
     eyebrow: "Hoddesdon · Est. family florist",
     heading: "Beautiful flowers, lovingly made.",
-    lede: "Fresh, hand-tied arrangements for every occasion — from weddings and celebrations to funeral tributes — crafted by Louise with over 40 years' experience, right in the heart of Hoddesdon."
+    lede: "Fresh, hand-tied arrangements for every occasion — from weddings and celebrations to funeral tributes — crafted by Louise with over 40 years' experience, right in the heart of Hoddesdon.",
+    img: "images/hero.jpg"
   },
   services: [
     { id: "s1", title: "Weddings",                 desc: "Bouquets, buttonholes, arches and venue flowers — planned with you for your perfect day." },
@@ -110,6 +113,16 @@ authenticator.options = { window: 1 };
 const TOTP_SECRET = (process.env.TOTP_SECRET || "").trim();
 const TOTP_ENABLED = TOTP_SECRET.length >= 16;
 
+// Cloudinary — durable image hosting for admin photo uploads.
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+  secure: true
+});
+const cloudinaryReady = Boolean(process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET);
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
+
 function safeEqual(a, b) {
   const ab = Buffer.from(String(a)), bb = Buffer.from(String(b));
   return ab.length === bb.length && crypto.timingSafeEqual(ab, bb);
@@ -186,7 +199,8 @@ app.post("/api/admin/content", requireAuth, async (req, res) => {
     const hero = {
       eyebrow: pick(hb, content.hero.eyebrow, "eyebrow", 80),
       heading: pick(hb, content.hero.heading, "heading", 120),
-      lede:    pick(hb, content.hero.lede, "lede", 400)
+      lede:    pick(hb, content.hero.lede, "lede", 400),
+      img:     pick(hb, content.hero.img, "img", 300)
     };
     const services = content.services.map((s) => {
       const inp = (body.services || []).find((x) => x && x.id === s.id);
@@ -194,7 +208,7 @@ app.post("/api/admin/content", requireAuth, async (req, res) => {
     });
     const gallery = content.gallery.map((g) => {
       const inp = (body.gallery || []).find((x) => x && x.id === g.id);
-      return { ...g, caption: pick(inp, g.caption, "caption", 60) };
+      return { ...g, caption: pick(inp, g.caption, "caption", 60), img: pick(inp, g.img, "img", 300) };
     });
     const boxes = content.boxes.map((b) => {
       const inp = (body.boxes || []).find((x) => x && x.id === b.id);
@@ -202,7 +216,8 @@ app.post("/api/admin/content", requireAuth, async (req, res) => {
         title: pick(inp, b.title, "title", 80),
         desc:  pick(inp, b.desc, "desc", 240),
         price: pick(inp, b.price, "price", 40),
-        tag:   pick(inp, b.tag, "tag", 30) };
+        tag:   pick(inp, b.tag, "tag", 30),
+        img:   pick(inp, b.img, "img", 300) };
     });
     const cb = body.contact || {};
     const contactNew = {
@@ -224,6 +239,25 @@ app.post("/api/admin/content", requireAuth, async (req, res) => {
     res.json({ ok: true, ...next });
   } catch (err) {
     res.status(400).json({ error: err.message });
+  }
+});
+
+// Admin: upload a photo to Cloudinary; returns the hosted URL to store in content.
+app.post("/api/admin/upload", requireAuth, upload.single("file"), async (req, res) => {
+  if (!cloudinaryReady) return res.status(503).json({ error: "Image uploads aren't configured yet" });
+  if (!req.file) return res.status(400).json({ error: "No file received" });
+  try {
+    const result = await new Promise((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream(
+        { folder: "louises-florist", resource_type: "image",
+          transformation: [{ width: 1400, height: 1400, crop: "limit" }, { quality: "auto", fetch_format: "auto" }] },
+        (err, r) => (err ? reject(err) : resolve(r))
+      );
+      stream.end(req.file.buffer);
+    });
+    res.json({ url: result.secure_url });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 

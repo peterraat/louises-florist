@@ -10,7 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{ --teal:#2b8f9b; --teal-dk:#1f6f79; --gold:#c49a53; --cream:#f3f8f9; --cream-2:#e2eef0;
-    --ink:#26383c; --ink-soft:#5d7176; --line:#d5e4e6; --green:#2e7d51; --amber:#b26a00; }
+    --ink:#26383c; --ink-soft:#5d7176; --line:#d5e4e6; --green:#2e7d51; --red:#b42318; }
   *{ box-sizing:border-box; margin:0; padding:0; }
   body{ font-family:'Montserrat',-apple-system,'Segoe UI',Roboto,sans-serif; background:var(--cream); color:var(--ink); }
   header{ background:#fff; border-bottom:1px solid var(--line); padding:12px 20px;
@@ -23,37 +23,50 @@
   header a, header button{ font:inherit; font-size:13px; font-weight:600; text-decoration:none; color:var(--ink);
     background:var(--cream-2); border:none; border-radius:8px; padding:8px 12px; cursor:pointer; }
   header a:hover, header button:hover{ background:var(--line); }
-  .wrap{ max-width:720px; margin:0 auto; padding:24px 18px 84px; }
-  h2{ font-size:12px; text-transform:uppercase; letter-spacing:.1em; color:var(--teal); margin:28px 0 10px; font-weight:800; }
+  .wrap{ max-width:1000px; margin:0 auto; padding:22px 18px 78px; }
+  h2{ font-size:12px; text-transform:uppercase; letter-spacing:.1em; color:var(--teal); margin:26px 0 10px; font-weight:800; }
   .card{ background:#fff; border:1px solid var(--line); border-radius:16px; padding:18px 20px; margin-bottom:14px; }
 
+  /* Card grids mirror the live page layout */
+  #boxes, #gallery{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+  #services{ display:grid; grid-template-columns:repeat(2,1fr); gap:14px; }
+  #boxes .card, #gallery .card, #services .card{ margin-bottom:0; }
+  @media(max-width:820px){ #boxes, #gallery, #services{ grid-template-columns:repeat(2,1fr); } }
+  @media(max-width:560px){ #boxes, #gallery, #services, .grid2{ grid-template-columns:1fr; } }
+
+  /* Maintenance toggle: green = live, red = holding page */
   .maint{ display:flex; align-items:center; gap:16px; }
   .maint .txt b{ display:block; font-size:15px; } .maint .txt span{ font-size:13px; color:var(--ink-soft); }
   .maint .sp{ flex:1; }
-  .switch{ position:relative; width:58px; height:32px; flex:none; }
+  .switch{ position:relative; width:62px; height:34px; flex:none; }
   .switch input{ opacity:0; width:0; height:0; }
-  .slider{ position:absolute; inset:0; background:#c7d8da; border-radius:999px; transition:.2s; cursor:pointer; }
-  .slider::before{ content:""; position:absolute; height:24px; width:24px; left:4px; top:4px; background:#fff; border-radius:50%; transition:.2s; box-shadow:0 1px 3px rgba(0,0,0,.25); }
-  input:checked + .slider{ background:var(--amber); }
-  input:checked + .slider::before{ transform:translateX(26px); }
-  .maint-live{ font-size:13px; font-weight:700; color:var(--amber); display:none; margin-top:6px; }
+  .slider{ position:absolute; inset:0; border-radius:999px; cursor:pointer; transition:.2s;
+    background:linear-gradient(180deg,#41b478,#2e7d51); }
+  .slider::before{ content:""; position:absolute; height:26px; width:26px; left:4px; top:4px; background:#fff; border-radius:50%; transition:.2s; box-shadow:0 1px 3px rgba(0,0,0,.3); }
+  input:checked + .slider{ background:linear-gradient(180deg,#e0685e,#b42318); }
+  input:checked + .slider::before{ transform:translateX(28px); }
+  .maint-live{ font-size:13px; font-weight:700; color:var(--red); display:none; margin-top:6px; }
   body.maint-on .maint-live{ display:block; }
 
   label{ display:block; font-size:12px; font-weight:700; color:var(--ink-soft); margin:10px 0 4px; text-transform:uppercase; letter-spacing:.05em; }
-  input[type=text], textarea{ width:100%; font:inherit; padding:.6em .75em; border:1px solid var(--line); border-radius:10px; background:var(--cream); }
+  input[type=text], textarea{ width:100%; font:inherit; padding:.55em .7em; border:1px solid var(--line); border-radius:10px; background:var(--cream); }
   input:focus, textarea:focus{ outline:none; border-color:var(--teal); box-shadow:0 0 0 3px rgba(43,143,155,.2); background:#fff; }
   textarea{ resize:vertical; }
   .hint{ font-size:11px; color:var(--ink-soft); font-weight:500; text-transform:none; letter-spacing:0; margin-top:4px; }
   .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
-  .box .row{ display:grid; grid-template-columns:1fr 150px; gap:12px; }
-  @media(max-width:520px){ .grid2, .box .row, .hours-row{ grid-template-columns:1fr; } }
-  .thumb{ float:right; width:54px; height:54px; border-radius:10px; object-fit:cover; margin:0 0 6px 12px; border:1px solid var(--line); }
   .hours-row{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:8px; }
+
+  /* Photo upload control */
+  .photo{ float:right; text-align:center; margin:0 0 8px 14px; }
+  .thumb{ width:72px; height:72px; border-radius:10px; object-fit:cover; border:1px solid var(--line); display:block; background:var(--cream-2); }
+  .thumb.noimg{ visibility:hidden; }
+  .up-btn{ display:inline-block; margin-top:5px; font-size:11px; font-weight:700; color:var(--teal); cursor:pointer; }
+  .up-btn:hover{ text-decoration:underline; }
 
   .bar{ position:sticky; bottom:0; margin-top:22px; display:flex; align-items:center; gap:16px;
     background:#fff; border:1px solid var(--line); border-radius:16px; padding:14px 18px; box-shadow:0 -6px 24px rgba(31,60,64,.08); }
   .bar .sp{ flex:1; }
-  .status{ font-size:14px; font-weight:600; } .status.ok{ color:var(--green); } .status.err{ color:#b42318; }
+  .status{ font-size:14px; font-weight:600; } .status.ok{ color:var(--green); } .status.err{ color:var(--red); }
   .save{ font:inherit; font-weight:700; padding:12px 28px; border:none; border-radius:40px; background:var(--teal); color:#fff; cursor:pointer; }
   .save:hover{ background:var(--teal-dk); } .save:disabled{ opacity:.6; cursor:not-allowed; }
   .note{ font-size:13px; color:var(--ink-soft); margin:6px 2px 0; }
@@ -72,10 +85,22 @@
   </header>
 
   <div class="wrap">
-    <p class="intro">Laid out top-to-bottom to match your live page — sections ①–⑤ follow the order visitors see. Edit anything, hit <b>Save</b>, and it's live.</p>
+    <p class="intro">Laid out to match your live page — sections ①–⑤ follow the order visitors see, and the cards sit in the same grid. Edit anything, hit <b>Save</b>, and it's live.</p>
+
+    <h2>Maintenance mode</h2>
+    <div class="card maint">
+      <div class="txt">
+        <b>Show a "back soon" page to visitors</b>
+        <span><span style="color:var(--green);font-weight:700;">Green = site live</span> · <span style="color:var(--red);font-weight:700;">Red = holding page</span>. You always see the real site.</span>
+        <div class="maint-live">● LIVE: visitors currently see the holding page.</div>
+      </div>
+      <span class="sp"></span>
+      <label class="switch"><input type="checkbox" id="maint"><span class="slider"></span></label>
+    </div>
 
     <h2>① Hero — top of the page</h2>
-    <div class="card">
+    <div class="card" id="hero-card" data-img="">
+      <div class="photo"><img class="thumb" src="" alt="" onerror="this.classList.add('noimg')"><label class="up-btn">Change background<input type="file" accept="image/*" hidden></label></div>
       <label>Small heading (eyebrow)</label>
       <input type="text" id="h-eyebrow" maxlength="80">
       <label>Main heading</label>
@@ -89,11 +114,9 @@
 
     <h2>③ Gallery — "A little inspiration"</h2>
     <div id="gallery"></div>
-    <p class="note">Captions only for now — photos become editable in the next update.</p>
 
     <h2>④ Shop boxes — "Order online"</h2>
     <div id="boxes"></div>
-    <p class="note">Prices are free text — write them however you like (e.g. "from £25", "£40", "P.O.A."). Photos come in the next update.</p>
 
     <h2>⑤ Contact &amp; hours — "Visit the shop"</h2>
     <div class="card">
@@ -109,17 +132,6 @@
       <div id="hours"></div>
     </div>
 
-    <h2>Maintenance mode <span style="text-transform:none;letter-spacing:0;font-weight:500;color:var(--ink-soft);">(site control)</span></h2>
-    <div class="card maint">
-      <div class="txt">
-        <b>Show a "back soon" page to visitors</b>
-        <span>Turn on while you're updating things. You'll still see the real site; visitors see the holding page.</span>
-        <div class="maint-live">● LIVE: visitors currently see the holding page.</div>
-      </div>
-      <span class="sp"></span>
-      <label class="switch"><input type="checkbox" id="maint"><span class="slider"></span></label>
-    </div>
-
     <div class="bar">
       <span class="status" id="status"></span>
       <span class="sp"></span>
@@ -130,57 +142,73 @@
 <script>
   const $=id=>document.getElementById(id);
   const servicesEl=$('services'), boxesEl=$('boxes'), galleryEl=$('gallery'), hoursEl=$('hours'),
-        statusEl=$('status'), saveBtn=$('save'), maintEl=$('maint');
+        statusEl=$('status'), saveBtn=$('save'), maintEl=$('maint'), heroCard=$('hero-card');
   let data={};
   const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const imgSrc=img=>{ img=img||''; return img.indexOf('http')===0?img:(img?'/'+img:''); };
   const flash=(m,ok)=>{ statusEl.textContent=m; statusEl.className='status'+(m?(ok?' ok':' err'):''); };
 
+  const photo=img=>`<div class="photo"><img class="thumb${img?'':' noimg'}" src="${imgSrc(img)}" alt="" onerror="this.classList.add('noimg')"><label class="up-btn">Change photo<input type="file" accept="image/*" hidden></label></div>`;
   function serviceCard(s){
     return `<div class="card svc" data-id="${s.id}">
       <label>Title</label><input type="text" data-f="title" value="${esc(s.title)}" maxlength="60">
-      <label>Description</label><textarea data-f="desc" rows="2" maxlength="240">${esc(s.desc)}</textarea>
+      <label>Description</label><textarea data-f="desc" rows="3" maxlength="240">${esc(s.desc)}</textarea>
     </div>`;
   }
   function boxCard(b){
-    return `<div class="card box" data-id="${b.id}">
-      ${b.img?`<img class="thumb" src="/${esc(b.img)}" alt="" onerror="this.remove()">`:''}
+    return `<div class="card box" data-id="${b.id}" data-img="${esc(b.img||'')}">
+      ${photo(b.img)}
       <label>Title</label><input type="text" data-f="title" value="${esc(b.title)}" maxlength="80">
-      <div class="row">
-        <div><label>Price</label><input type="text" data-f="price" value="${esc(b.price)}" maxlength="40"></div>
-        <div><label>Tag</label><input type="text" data-f="tag" value="${esc(b.tag)}" maxlength="30"></div>
-      </div>
+      <label>Price</label><input type="text" data-f="price" value="${esc(b.price)}" maxlength="40">
+      <label>Tag</label><input type="text" data-f="tag" value="${esc(b.tag)}" maxlength="30">
       <label>Description</label><textarea data-f="desc" rows="2" maxlength="240">${esc(b.desc)}</textarea>
     </div>`;
   }
   function galCard(g){
-    return `<div class="card gal" data-id="${g.id}">
-      ${g.img?`<img class="thumb" src="/${esc(g.img)}" alt="" onerror="this.remove()">`:''}
+    return `<div class="card gal" data-id="${g.id}" data-img="${esc(g.img||'')}">
+      ${photo(g.img)}
       <label>Caption</label><input type="text" data-f="caption" value="${esc(g.caption)}" maxlength="60">
     </div>`;
   }
-  function hoursRow(h,i){
-    return `<div class="hours-row" data-i="${i}">
+  function hoursRow(h){
+    return `<div class="hours-row">
       <input type="text" data-f="day" value="${esc(h.day)}" maxlength="30" placeholder="e.g. Mon – Fri">
       <input type="text" data-f="time" value="${esc(h.time)}" maxlength="30" placeholder="e.g. 9:00 – 5:00">
     </div>`;
   }
 
+  function wireUploads(){
+    document.querySelectorAll('.photo input[type=file]').forEach(function(inp){
+      inp.addEventListener('change', function(){
+        var file=inp.files[0]; if(!file) return;
+        var holder=inp.closest('[data-img]'), thumb=inp.closest('.photo').querySelector('.thumb');
+        var lbl=inp.closest('.up-btn'), span=lbl.childNodes[0], orig=span.textContent; span.textContent='Uploading…';
+        var fd=new FormData(); fd.append('file',file);
+        fetch('/api/admin/upload',{method:'POST',body:fd})
+          .then(function(r){ if(r.status===401){ location.href='/admin'; return null; } return r.json(); })
+          .then(function(d){ span.textContent=orig; inp.value='';
+            if(d&&d.url){ holder.dataset.img=d.url; thumb.src=d.url; thumb.classList.remove('noimg'); flash('Photo uploaded — hit Save to publish.',true); }
+            else flash((d&&d.error)||'Upload failed',false); })
+          .catch(function(){ span.textContent=orig; flash('Upload failed',false); });
+      });
+    });
+  }
+
   async function load(){
     const r=await fetch('/api/admin/content'); if(r.status===401){ location.href='/admin'; return; }
     data=await r.json();
-    // hero
     $('h-eyebrow').value=data.hero.eyebrow||''; $('h-heading').value=data.hero.heading||''; $('h-lede').value=data.hero.lede||'';
-    // lists
+    heroCard.dataset.img=data.hero.img||'';
+    var ht=heroCard.querySelector('.thumb'); if(data.hero.img){ ht.src=imgSrc(data.hero.img); ht.classList.remove('noimg'); } else ht.classList.add('noimg');
     servicesEl.innerHTML=data.services.map(serviceCard).join('');
-    boxesEl.innerHTML=data.boxes.map(boxCard).join('');
     galleryEl.innerHTML=data.gallery.map(galCard).join('');
-    // contact
+    boxesEl.innerHTML=data.boxes.map(boxCard).join('');
     const c=data.contact||{};
     $('c-name').value=c.name||''; $('c-address').value=c.address||''; $('c-phone').value=c.phone||'';
     $('c-whatsapp').value=c.whatsapp||''; $('c-email').value=c.email||''; $('c-facebook').value=c.facebook||'';
     hoursEl.innerHTML=(c.hours||[]).map(hoursRow).join('');
-    // maintenance
     maintEl.checked=!!data.maintenance; document.body.classList.toggle('maint-on', maintEl.checked);
+    wireUploads();
     document.querySelectorAll('input,textarea').forEach(i=>i.addEventListener('input',()=>flash('')));
     maintEl.addEventListener('change',()=>document.body.classList.toggle('maint-on', maintEl.checked));
   }
@@ -188,6 +216,7 @@
   function collectList(root, sel, fields){
     return [...root.querySelectorAll(sel)].map(el=>{
       const o={ id:el.dataset.id };
+      if(el.dataset.img!==undefined) o.img=el.dataset.img;
       fields.forEach(f=>{ o[f]=el.querySelector(`[data-f="${f}"]`).value; });
       return o;
     });
@@ -195,10 +224,10 @@
 
   saveBtn.addEventListener('click', async ()=>{
     const payload={
-      hero:{ eyebrow:$('h-eyebrow').value, heading:$('h-heading').value, lede:$('h-lede').value },
+      hero:{ eyebrow:$('h-eyebrow').value, heading:$('h-heading').value, lede:$('h-lede').value, img:heroCard.dataset.img },
       services: collectList(servicesEl,'.svc',['title','desc']),
-      boxes: collectList(boxesEl,'.box',['title','price','tag','desc']),
       gallery: collectList(galleryEl,'.gal',['caption']),
+      boxes: collectList(boxesEl,'.box',['title','price','tag','desc']),
       contact:{
         name:$('c-name').value, address:$('c-address').value, phone:$('c-phone').value,
         whatsapp:$('c-whatsapp').value, email:$('c-email').value, facebook:$('c-facebook').value,
