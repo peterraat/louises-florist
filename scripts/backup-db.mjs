@@ -26,15 +26,32 @@ try {
   const dir = path.join(OUT, dbName);
   await mkdir(dir, { recursive: true });
 
+  // GitHub rejects files over 100 MB. Skip anything near that with a loud warning
+  // so a data-heavy database (e.g. re-downloadable market data) never breaks the
+  // push — those need a different backup strategy, not git.
+  const MAX_BYTES = 90 * 1024 * 1024;
+
   let totalDocs = 0;
   const names = [];
+  const skipped = [];
   for (const c of collections) {
     // sort by _id so the file is stable (no spurious diffs when data is unchanged)
     const docs = await db.collection(c.name).find({}).sort({ _id: 1 }).toArray();
-    await writeFile(path.join(dir, `${c.name}.json`), pretty(docs));
+    const json = pretty(docs);
+    const bytes = Buffer.byteLength(json);
+    if (bytes > MAX_BYTES) {
+      const mb = (bytes / 1024 / 1024).toFixed(1);
+      console.warn(`  ⚠ ${c.name}: ${mb} MB — too large for git, SKIPPED (needs a non-git backup strategy)`);
+      skipped.push({ collection: c.name, megabytes: Number(mb) });
+      continue;
+    }
+    await writeFile(path.join(dir, `${c.name}.json`), json);
     console.log(`  ${c.name}: ${docs.length} document(s)`);
     totalDocs += docs.length;
     names.push(c.name);
+  }
+  if (skipped.length) {
+    console.warn(`Skipped ${skipped.length} oversized collection(s): ${skipped.map((s) => s.collection).join(", ")}`);
   }
 
   // manifest (no timestamp on purpose — a volatile timestamp would create a
@@ -43,6 +60,7 @@ try {
     database: dbName,
     collections: names,
     documentCount: totalDocs,
+    skippedOversized: skipped,
     restoreWith: "scripts/restore-db.mjs"
   }));
 
