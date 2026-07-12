@@ -1,0 +1,28 @@
+name: Mirror to GitLab backup
+
+# Runs on every push to GitHub and copies the whole repo to a GitLab backup repo.
+# Reusable template: to back up another site, copy this file into its repo,
+# add the same GITLAB_TOKEN secret, and change the GitLab URL below.
+
+on:
+  push:
+    branches: ['**']
+    tags: ['**']
+  workflow_dispatch:        # lets you trigger a backup manually from the Actions tab
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0    # grab all commits + tags, not just the latest
+
+      - name: Push to GitLab
+        env:
+          GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
+        run: |
+          git remote add backup "https://oauth2:${GITLAB_TOKEN}@gitlab.com/lifeswonderful/louises-florist-backup.git"
+          git push backup --all --force
+          git push backup --tags --force
