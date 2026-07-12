@@ -69,6 +69,16 @@ const DEFAULT_CONTENT = {
       { day: "Sunday",    time: "Closed" }
     ]
   },
+  social: [
+    { id: "facebook",  name: "Facebook",  url: "https://www.facebook.com/Louisesfloristhoddesdon/", enabled: true },
+    { id: "instagram", name: "Instagram", url: "", enabled: false },
+    { id: "tiktok",    name: "TikTok",    url: "", enabled: false },
+    { id: "pinterest", name: "Pinterest", url: "", enabled: false },
+    { id: "youtube",   name: "YouTube",   url: "", enabled: false },
+    { id: "x",         name: "X (Twitter)", url: "", enabled: false },
+    { id: "whatsapp",  name: "WhatsApp",  url: "", enabled: false },
+    { id: "linkedin",  name: "LinkedIn",  url: "", enabled: false }
+  ],
   maintenance: false
 };
 
@@ -90,6 +100,11 @@ function mergeContent(def, s) {
     boxes: (Array.isArray(s.boxes) && s.boxes.length) ? s.boxes : def.boxes,
     contact: { ...def.contact, ...(s.contact || {}),
       hours: (s.contact && Array.isArray(s.contact.hours) && s.contact.hours.length) ? s.contact.hours : def.contact.hours },
+    // keep the full default platform list; overlay stored url/enabled by id
+    social: def.social.map((p) => {
+      const st = (Array.isArray(s.social) ? s.social : []).find((x) => x && x.id === p.id) || {};
+      return { ...p, url: typeof st.url === "string" ? st.url : p.url, enabled: typeof st.enabled === "boolean" ? st.enabled : p.enabled };
+    }),
     maintenance: typeof s.maintenance === "boolean" ? s.maintenance : def.maintenance
   };
 }
@@ -159,7 +174,7 @@ function requireAuth(req, res, next) { return isAdmin(req) ? next() : res.status
 /* ===================== PUBLIC API ===================== */
 app.get("/api/content", (req, res) => {
   res.set("Cache-Control", "no-store");
-  res.json({ hero: content.hero, services: content.services, occasions: content.occasions, gallery: content.gallery, boxes: content.boxes, contact: content.contact });
+  res.json({ hero: content.hero, services: content.services, occasions: content.occasions, gallery: content.gallery, boxes: content.boxes, contact: content.contact, social: (content.social || []).filter((p) => p.enabled && p.url) });
 });
 app.get("/api/login-config", (req, res) => res.json({ totp: TOTP_ENABLED }));
 app.get("/api/me", (req, res) => res.json({ admin: isAdmin(req) }));  // for inline editing on the live site
@@ -244,9 +259,16 @@ app.post("/api/admin/content", requireAuth, async (req, res) => {
         ? cb.hours.slice(0, 7).map((h) => ({ day: clean(h && h.day, 30), time: clean(h && h.time, 30) }))
         : content.contact.hours
     };
+    const social = (content.social || []).map((p) => {
+      const inp = (body.social || []).find((x) => x && x.id === p.id);
+      if (!inp) return p;
+      return { ...p,
+        url:     inp.url === undefined ? p.url : clean(inp.url, 300),
+        enabled: inp.enabled === undefined ? p.enabled : !!inp.enabled };
+    });
     const maintenance = body.maintenance === undefined ? content.maintenance : !!body.maintenance;
 
-    const next = { hero, services, occasions, gallery, boxes, contact: contactNew, maintenance };
+    const next = { hero, services, occasions, gallery, boxes, contact: contactNew, social, maintenance };
     await Content.findByIdAndUpdate("singleton", { data: next, updatedAt: new Date() }, { upsert: true });
     content = next;
     res.json({ ok: true, ...next });

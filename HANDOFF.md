@@ -48,6 +48,7 @@ FB /Louisesfloristhoddesdon.
 - `gallery[6]` {id, caption, img}
 - `boxes[6]` {id, title, desc, price, tag, img}   ← the shop cards
 - `contact` {name, address, phone, whatsapp, email, facebook, hours[]}
+- `social[8]` {id, name, url, enabled} — footer buttons; only enabled+url ones show
 - `maintenance` (bool) — holding page toggle
 
 ## Key files
@@ -92,6 +93,10 @@ Cloudinary is only enabled when all three Cloudinary vars are present.
 
 ## Done recently (2026-07-11 → 07-12)
 
+- **Social media buttons** — admin section ⑥ has a per-platform toggle + link box for 8 popular
+  platforms (Facebook, Instagram, TikTok, Pinterest, YouTube, X, WhatsApp, LinkedIn). The storefront
+  footer shows a button only for platforms that are toggled on *and* have a link; if none are on, no
+  social row appears at all. Brand SVG icons are inlined in `index.html` (`ICONS` map in `loadContent`).
 - Editable **occasions** ("the moment") with an **inline emoji icon picker** (~52 florist emojis).
 - **Anchor scroll fix** — "Order flowers" and nav links no longer land a section under the sticky
   header (added `scroll-margin-top`).
@@ -103,11 +108,8 @@ Cloudinary is only enabled when all three Cloudinary vars are present.
 
 ## Still to do
 
-1. **Social media buttons** — admin backend gets a per-platform toggle (checkbox) for all the
-   popular platforms; the storefront shows a social bar at the bottom **only if at least one is
-   toggled on** (no toggles on = no social section at all). *(not started)*
-2. **Add occasions to the admin panel** — they're currently editable inline on the live site only;
+1. **Add occasions to the admin panel** — they're currently editable inline on the live site only;
    mirror them in `views/admin.html` too.
-3. **Mobile responsiveness sweep** of the storefront.
-4. Real prices/photos confirmed with Louise; wire the order/enquiry form to actually send.
-5. Optional: custom domain → point DNS at Render + HTTPS.
+2. **Mobile responsiveness sweep** of the storefront.
+3. Real prices/photos confirmed with Louise; wire the order/enquiry form to actually send.
+4. Optional: custom domain → point DNS at Render + HTTPS.

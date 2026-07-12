@@ -56,6 +56,14 @@
   .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
   .hours-row{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:8px; }
 
+  /* Social media rows: per-platform toggle + link */
+  #social .soc-row{ display:grid; grid-template-columns:180px 1fr; gap:12px; align-items:center; margin-bottom:10px; }
+  #social .soc-toggle{ display:flex; align-items:center; gap:9px; margin:0; text-transform:none; letter-spacing:0; font-size:14px; color:var(--ink); cursor:pointer; }
+  #social .soc-toggle input{ width:34px; height:20px; flex:none; accent-color:var(--green); cursor:pointer; }
+  #social .soc-row.off .soc-toggle b{ color:var(--ink-soft); }
+  #social .soc-row.off input[type=text]{ opacity:.55; }
+  @media(max-width:560px){ #social .soc-row{ grid-template-columns:1fr; gap:6px; } }
+
   /* Photo upload control */
   .photo{ float:right; text-align:center; margin:0 0 8px 14px; }
   .thumb{ width:72px; height:72px; border-radius:10px; object-fit:cover; border:1px solid var(--line); display:block; background:var(--cream-2); }
@@ -104,7 +112,7 @@
   </header>
 
   <div class="wrap">
-    <p class="intro">Laid out to match your live page — sections ①–⑤ follow the order visitors see, and the cards sit in the same grid. Edit anything, hit <b>Save</b>, and it's live.</p>
+    <p class="intro">Laid out to match your live page — sections ①–⑥ follow the order visitors see, and the cards sit in the same grid. Edit anything, hit <b>Save</b>, and it's live.</p>
 
     <h2>Maintenance mode</h2>
     <div class="card maint">
@@ -151,6 +159,12 @@
       <div id="hours"></div>
     </div>
 
+    <h2>⑥ Social media — footer buttons</h2>
+    <div class="card">
+      <p class="note" style="margin:0 0 14px">Tick a platform and paste its link to show its button at the bottom of the site. Untick to hide it. If none are ticked, no social buttons appear at all.</p>
+      <div id="social"></div>
+    </div>
+
     <div class="bar">
       <span class="status" id="status"></span>
       <span class="sp"></span>
@@ -168,7 +182,7 @@
 <script>
   const $=id=>document.getElementById(id);
   const servicesEl=$('services'), boxesEl=$('boxes'), galleryEl=$('gallery'), hoursEl=$('hours'),
-        statusEl=$('status'), saveBtn=$('save'), maintEl=$('maint'), heroCard=$('hero-card');
+        socialEl=$('social'), statusEl=$('status'), saveBtn=$('save'), maintEl=$('maint'), heroCard=$('hero-card');
   let data={};
   const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const imgSrc=img=>{ img=img||''; return img.indexOf('http')===0?img:(img?'/'+img:''); };
@@ -242,6 +256,13 @@
       <label>Caption</label><input type="text" data-f="caption" value="${esc(g.caption)}" maxlength="60">
     </div>`;
   }
+  const socPlaceholder={ facebook:'https://facebook.com/yourpage', instagram:'https://instagram.com/yourhandle', tiktok:'https://tiktok.com/@yourhandle', pinterest:'https://pinterest.com/yourpage', youtube:'https://youtube.com/@yourchannel', x:'https://x.com/yourhandle', whatsapp:'https://wa.me/447930318018', linkedin:'https://linkedin.com/company/yourpage' };
+  function socialRow(p){
+    return `<div class="soc-row${p.enabled?'':' off'}" data-id="${esc(p.id)}">
+      <label class="soc-toggle"><input type="checkbox" data-f="enabled"${p.enabled?' checked':''}> <b>${esc(p.name)}</b></label>
+      <input type="text" data-f="url" value="${esc(p.url)}" maxlength="300" placeholder="${esc(socPlaceholder[p.id]||'https://…')}">
+    </div>`;
+  }
   function hoursRow(h){
     return `<div class="hours-row">
       <input type="text" data-f="day" value="${esc(h.day)}" maxlength="30" placeholder="e.g. Mon – Fri">
@@ -285,6 +306,10 @@
     $('c-name').value=c.name||''; $('c-address').value=c.address||''; $('c-phone').value=c.phone||'';
     $('c-whatsapp').value=c.whatsapp||''; $('c-email').value=c.email||''; $('c-facebook').value=c.facebook||'';
     hoursEl.innerHTML=(c.hours||[]).map(hoursRow).join('');
+    socialEl.innerHTML=(data.social||[]).map(socialRow).join('');
+    socialEl.querySelectorAll('.soc-row input[data-f="enabled"]').forEach(function(cb){
+      cb.addEventListener('change', function(){ cb.closest('.soc-row').classList.toggle('off', !cb.checked); });
+    });
     maintEl.checked=!!data.maintenance; document.body.classList.toggle('maint-on', maintEl.checked);
     wireUploads();
     document.querySelectorAll('input,textarea').forEach(i=>i.addEventListener('input',()=>flash('')));
@@ -311,6 +336,7 @@
         whatsapp:$('c-whatsapp').value, email:$('c-email').value, facebook:$('c-facebook').value,
         hours:[...hoursEl.querySelectorAll('.hours-row')].map(r=>({ day:r.querySelector('[data-f="day"]').value, time:r.querySelector('[data-f="time"]').value }))
       },
+      social:[...socialEl.querySelectorAll('.soc-row')].map(r=>({ id:r.dataset.id, enabled:r.querySelector('[data-f="enabled"]').checked, url:r.querySelector('[data-f="url"]').value.trim() })),
       maintenance: maintEl.checked
     };
     saveBtn.disabled=true; const t=saveBtn.textContent; saveBtn.textContent='Saving…';
