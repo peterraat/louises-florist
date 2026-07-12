@@ -145,8 +145,14 @@
     var fd = new FormData(); fd.append("file", file);
     imgGrid.innerHTML = '<p class="lf-msg">Uploading…</p>';
     fetch("/api/admin/upload", { method: "POST", body: fd }).then(function (r) { if (r.status === 401) { location.href = "/admin"; return null; } return r.json(); })
-      .then(function (d) { inp.value = ""; if (d && d.url) { imgLoaded = false; applyImage(d.url); } else imgGrid.innerHTML = '<p class="lf-msg">' + ((d && d.error) || "Upload failed.") + "</p>"; })
+      .then(function (d) { inp.value = ""; if (d && d.url) { confirmUse(d.url); } else imgGrid.innerHTML = '<p class="lf-msg">' + ((d && d.error) || "Upload failed.") + "</p>"; })
       .catch(function () { imgGrid.innerHTML = '<p class="lf-msg">Upload failed.</p>'; });
+  }
+  function confirmUse(url) {
+    imgLoaded = false; // the new photo is now in the library
+    imgGrid.innerHTML = '<div class="lf-confirm"><img class="lf-confirm-img" src="' + url + '" alt=""><p>✓ Saved to your photo library.<br>Use this photo here now?</p><div class="lf-confirm-btns"><button class="lf-yes" type="button">Use it here</button><button class="lf-nope" type="button">Just keep in library</button></div></div>';
+    imgGrid.querySelector(".lf-yes").addEventListener("click", function () { applyImage(url); });
+    imgGrid.querySelector(".lf-nope").addEventListener("click", function () { openImageEditor(imgTarget); });
   }
   function applyImage(url) {
     if (!imgTarget) return;
@@ -194,6 +200,12 @@
       ".lf-media{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;border:1px solid #d5e4e6;cursor:pointer;}" +
       ".lf-media:hover{border-color:#2b8f9b;box-shadow:0 0 0 3px rgba(43,143,155,.25);}" +
       ".lf-msg{padding:24px;color:#5d7176;font-size:14px;text-align:center;grid-column:1/-1;}" +
+      ".lf-confirm{grid-column:1/-1;text-align:center;padding:24px;}" +
+      ".lf-confirm-img{max-width:220px;max-height:200px;border-radius:12px;border:1px solid #d5e4e6;margin-bottom:14px;}" +
+      ".lf-confirm p{color:#26383c;font-size:14px;line-height:1.5;margin-bottom:16px;}" +
+      ".lf-confirm-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}" +
+      ".lf-yes{background:#2e7d51;color:#fff;border:none;border-radius:999px;padding:11px 22px;font-weight:700;font-size:14px;cursor:pointer;}" +
+      ".lf-nope{background:#e2eef0;color:#26383c;border:none;border-radius:999px;padding:11px 22px;font-weight:700;font-size:14px;cursor:pointer;}" +
       "body.lf-admin{padding-bottom:46px;}";
     var s = document.createElement("style"); s.textContent = css; document.head.appendChild(s);
   }
