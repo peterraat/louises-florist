@@ -8,7 +8,7 @@
 
   fetch("/api/me").then(function (r) { return r.json(); }).then(function (m) {
     isAdmin = !!(m && m.admin);
-    if (isAdmin) { injectStyles(); document.body.classList.add("lf-admin"); showBar(); showSignout(); if (ready) wire(); }
+    if (isAdmin) { injectStyles(); buildImageModal(); document.body.classList.add("lf-admin"); showBar(); showSignout(); if (ready) wire(); }
   }).catch(function () {});
 
   window.LFInlineEdit = function () { ready = true; if (isAdmin) wire(); };
@@ -16,6 +16,8 @@
   function wire() { if (wired) return; wired = true; document.addEventListener("click", onClick, true); }
 
   function onClick(e) {
+    var imgEl = e.target.closest("[data-editimg]");
+    if (imgEl) { e.preventDefault(); e.stopPropagation(); openImageEditor(imgEl); return; }
     var el = e.target.closest("[data-edit]");
     if (!el || el === active) return;
     e.preventDefault(); e.stopPropagation();
@@ -103,6 +105,59 @@
     var t = document.createElement("div"); t.className = "lf-toast" + (err ? " err" : ""); t.textContent = msg;
     document.body.appendChild(t); setTimeout(function () { t.remove(); }, 1800);
   }
+  /* ---- inline image editing (change photos on the live site) ---- */
+  var imgModal = null, imgGrid = null, imgTarget = null, imgLoaded = false, imgMedia = [];
+  function buildImageModal() {
+    imgModal = document.createElement("div"); imgModal.className = "lf-modal"; imgModal.hidden = true;
+    imgModal.innerHTML = '<div class="lf-modal-box"><div class="lf-modal-head"><b>Change photo</b><label class="lf-upload">Upload new<input type="file" accept="image/*" hidden></label><button class="lf-close" type="button">✕</button></div><div class="lf-modal-grid"></div></div>';
+    document.body.appendChild(imgModal);
+    imgGrid = imgModal.querySelector(".lf-modal-grid");
+    imgModal.querySelector(".lf-close").addEventListener("click", closeImageModal);
+    imgModal.addEventListener("click", function (e) { if (e.target === imgModal) closeImageModal(); });
+    imgModal.querySelector(".lf-upload input").addEventListener("change", function () { uploadImage(this); });
+    imgGrid.addEventListener("click", function (e) { var c = e.target.closest("[data-url]"); if (c) applyImage(c.getAttribute("data-url")); });
+  }
+  function openImageEditor(img) {
+    imgTarget = img; imgModal.hidden = false;
+    if (imgLoaded) { renderImgGrid(); return; }
+    imgGrid.innerHTML = '<p class="lf-msg">Loading your photos…</p>';
+    fetch("/api/admin/media").then(function (r) { if (r.status === 401) { location.href = "/admin"; return null; } return r.json(); })
+      .then(function (d) { if (d && d.images) { imgLoaded = true; imgMedia = d.images; renderImgGrid(); } else imgGrid.innerHTML = '<p class="lf-msg">' + ((d && d.error) || "Could not load photos.") + "</p>"; })
+      .catch(function () { imgGrid.innerHTML = '<p class="lf-msg">Could not load photos.</p>'; });
+  }
+  function renderImgGrid() {
+    imgGrid.innerHTML = imgMedia.length
+      ? imgMedia.map(function (m) { return '<img class="lf-media" src="' + m.url + '" data-url="' + m.url + '" alt="">'; }).join("")
+      : '<p class="lf-msg">No photos yet — click "Upload new" above.</p>';
+  }
+  function closeImageModal() { if (imgModal) imgModal.hidden = true; imgTarget = null; }
+  function uploadImage(inp) {
+    var file = inp.files[0]; if (!file) return;
+    var fd = new FormData(); fd.append("file", file);
+    imgGrid.innerHTML = '<p class="lf-msg">Uploading…</p>';
+    fetch("/api/admin/upload", { method: "POST", body: fd }).then(function (r) { if (r.status === 401) { location.href = "/admin"; return null; } return r.json(); })
+      .then(function (d) { inp.value = ""; if (d && d.url) { imgLoaded = false; applyImage(d.url); } else imgGrid.innerHTML = '<p class="lf-msg">' + ((d && d.error) || "Upload failed.") + "</p>"; })
+      .catch(function () { imgGrid.innerHTML = '<p class="lf-msg">Upload failed.</p>'; });
+  }
+  function applyImage(url) {
+    if (!imgTarget) return;
+    var payload = buildImg(imgTarget.getAttribute("data-editimg"), url);
+    if (!payload) { closeImageModal(); return; }
+    imgTarget.src = url;
+    fetch("/api/admin/content", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) })
+      .then(function (r) { if (r.status === 401) { location.href = "/admin"; return null; } return r.json(); })
+      .then(function (d) { if (d && d.ok) toast("Photo updated ✓"); else toast((d && d.error) || "Could not save", true); })
+      .catch(function () { toast("Save failed", true); });
+    closeImageModal();
+  }
+  function buildImg(path, url) {
+    var p = path.split(".");
+    if (p[0] === "hero") return { hero: { img: url } };
+    if (p[0] === "box") return { boxes: [{ id: p[1], img: url }] };
+    if (p[0] === "gallery") return { gallery: [{ id: p[1], img: url }] };
+    return null;
+  }
+
   function injectStyles() {
     var css =
       "body.lf-admin [data-edit]{outline:1px dashed rgba(43,143,155,.55);outline-offset:2px;cursor:text;transition:background .15s;}" +
@@ -117,6 +172,19 @@
       ".lf-toast.err{background:#b42318;}" +
       ".lf-signout{position:fixed;top:12px;right:12px;z-index:99999;background:#b42318;color:#fff;border:none;border-radius:8px;padding:8px 14px;font:600 13px Montserrat,system-ui,sans-serif;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.3);}" +
       ".lf-signout:hover{background:#8f1c12;}" +
+      "body.lf-admin [data-editimg]{outline:2px dashed rgba(43,143,155,.6);outline-offset:-2px;cursor:pointer;}" +
+      "body.lf-admin [data-editimg]:hover{outline-color:#2b8f9b;box-shadow:0 0 0 4px rgba(43,143,155,.25) inset;}" +
+      ".lf-modal{position:fixed;inset:0;z-index:100000;background:rgba(38,56,60,.6);display:flex;align-items:center;justify-content:center;padding:20px;}" +
+      ".lf-modal[hidden]{display:none;}" +
+      ".lf-modal-box{background:#fff;border-radius:16px;width:min(760px,100%);max-height:85vh;display:flex;flex-direction:column;overflow:hidden;font-family:Montserrat,system-ui,sans-serif;}" +
+      ".lf-modal-head{display:flex;align-items:center;gap:12px;padding:15px 20px;border-bottom:1px solid #e2eef0;}" +
+      ".lf-modal-head b{font-size:15px;color:#26383c;}" +
+      ".lf-upload{margin-left:auto;background:#2b8f9b;color:#fff;font-size:13px;font-weight:700;padding:8px 14px;border-radius:8px;cursor:pointer;}" +
+      ".lf-modal-head .lf-close{background:#e2eef0;border:none;border-radius:8px;width:32px;height:32px;cursor:pointer;font-size:15px;}" +
+      ".lf-modal-grid{overflow-y:auto;padding:16px;display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;}" +
+      ".lf-media{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;border:1px solid #d5e4e6;cursor:pointer;}" +
+      ".lf-media:hover{border-color:#2b8f9b;box-shadow:0 0 0 3px rgba(43,143,155,.25);}" +
+      ".lf-msg{padding:24px;color:#5d7176;font-size:14px;text-align:center;grid-column:1/-1;}" +
       "body.lf-admin{padding-bottom:46px;}";
     var s = document.createElement("style"); s.textContent = css; document.head.appendChild(s);
   }

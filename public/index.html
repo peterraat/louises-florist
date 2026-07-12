@@ -523,7 +523,7 @@
         set(document.querySelector('.hero-in .eyebrow'),d.hero.eyebrow,'hero.eyebrow');
         set(document.querySelector('.hero-in h1'),d.hero.heading,'hero.heading');
         set(document.querySelector('.hero-in .lede'),d.hero.lede,'hero.lede',true);
-        var hbg=document.querySelector('.hero .hero-bg'); if(hbg&&d.hero.img){ hbg.removeAttribute('onerror'); hbg.src=d.hero.img; }
+        var hbg=document.querySelector('.hero .hero-bg'); if(hbg){ hbg.setAttribute('data-editimg','hero.img'); if(d.hero.img){ hbg.removeAttribute('onerror'); hbg.src=d.hero.img; } }
       }
       // Services (4 cards)
       if(Array.isArray(d.services)){
@@ -538,7 +538,7 @@
         d.boxes.forEach(function(b,i){ var card=cards[i]; if(!card) return;
           set(card.querySelector('h3'),b.title,'box.'+b.id+'.title');
           set(card.querySelector('.shop-body p'),b.desc,'box.'+b.id+'.desc',true);
-          var bim=card.querySelector('.shop-img img'); if(bim&&b.img){ bim.removeAttribute('onerror'); bim.src=b.img; }
+          var bim=card.querySelector('.shop-img img'); if(bim){ bim.setAttribute('data-editimg','box.'+b.id+'.img'); if(b.img){ bim.removeAttribute('onerror'); bim.src=b.img; } }
           var price=card.querySelector('.shop-price'); if(price) price.innerHTML='<span data-edit="box.'+b.id+'.price">'+esc(b.price)+'</span>'+(b.tag?' <span class="shop-tag">· <span data-edit="box.'+b.id+'.tag">'+esc(b.tag)+'</span></span>':''); });
       }
       // Gallery captions (6)
@@ -546,7 +546,7 @@
         var tiles=document.querySelectorAll('#gallery .grid .tile');
         d.gallery.forEach(function(g,i){ var t=tiles[i]; if(!t) return;
           set(t.querySelector('span'),g.caption,'gallery.'+g.id+'.caption');
-          var im=t.querySelector('img'); if(im){ im.alt=g.caption; if(g.img){ im.removeAttribute('onerror'); im.src=g.img; } } });
+          var im=t.querySelector('img'); if(im){ im.alt=g.caption; im.setAttribute('data-editimg','gallery.'+g.id+'.img'); if(g.img){ im.removeAttribute('onerror'); im.src=g.img; } } });
       }
       // Contact
       if(d.contact){

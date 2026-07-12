@@ -276,6 +276,19 @@ app.get("/api/admin/media", requireAuth, async (req, res) => {
   }
 });
 
+// Admin: delete a photo from the Cloudinary library.
+app.post("/api/admin/media/delete", requireAuth, async (req, res) => {
+  if (!cloudinaryReady) return res.status(503).json({ error: "Image uploads aren't configured yet" });
+  const id = (req.body && req.body.id) || "";
+  if (!id || id.indexOf("louises-florist/") !== 0) return res.status(400).json({ error: "Invalid image" });
+  try {
+    const r = await cloudinary.uploader.destroy(id);
+    res.json({ ok: r.result === "ok" || r.result === "not found", result: r.result });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 /* ===================== ADMIN PAGE ===================== */
 app.get("/admin", (req, res) => {
   res.sendFile(path.join(__dirname, "views", isAdmin(req) ? "admin.html" : "login.html"));
