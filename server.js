@@ -141,6 +141,7 @@ app.get("/api/content", (req, res) => {
   res.json({ hero: content.hero, services: content.services, gallery: content.gallery, boxes: content.boxes, contact: content.contact });
 });
 app.get("/api/login-config", (req, res) => res.json({ totp: TOTP_ENABLED }));
+app.get("/api/me", (req, res) => res.json({ admin: isAdmin(req) }));  // for inline editing on the live site
 app.get("/healthz", (req, res) => res.json({ ok: true }));
 
 /* ===================== AUTH ===================== */
