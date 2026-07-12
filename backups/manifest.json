@@ -1,0 +1,9 @@
+{
+  "database": "louisesflorist",
+  "collections": [
+    "contents"
+  ],
+  "documentCount": 1,
+  "skippedOversized": [],
+  "restoreWith": "scripts/restore-db.mjs"
+}

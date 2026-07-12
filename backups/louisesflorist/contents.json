@@ -1,0 +1,273 @@
+[
+  {
+    "_id": "singleton",
+    "boxes": [
+      {
+        "id": "b1",
+        "title": "Hand-tied Bouquet",
+        "desc": "A beautiful seasonal mix, hand-tied and beautifully wrapped.",
+        "price": "from £27",
+        "tag": "seasonal",
+        "img": "images/g1.jpg"
+      },
+      {
+        "id": "b2",
+        "title": "Luxury Bouquet",
+        "desc": "A generous, statement arrangement of premium blooms.",
+        "price": "from £45",
+        "tag": "deluxe",
+        "img": "images/g4.jpg"
+      },
+      {
+        "id": "b3",
+        "title": "A Dozen Roses",
+        "desc": "Classic and romantic — a dozen fresh roses, beautifully tied.",
+        "price": "from £35",
+        "tag": "roses",
+        "img": "images/g6.jpg"
+      },
+      {
+        "id": "b4",
+        "title": "Seasonal Blooms",
+        "desc": "Whatever's freshest that week, arranged with a keen eye.",
+        "price": "from £30",
+        "tag": "seasonal",
+        "img": "images/g2.jpg"
+      },
+      {
+        "id": "b5",
+        "title": "Sympathy Tribute",
+        "desc": "Dignified funeral tributes and sympathy flowers, made with care.",
+        "price": "from £40",
+        "tag": "tribute",
+        "img": "images/g5.jpg"
+      },
+      {
+        "id": "b6",
+        "title": "Bright & Cheerful",
+        "desc": "A vibrant, happy bunch to brighten anyone's day.",
+        "price": "from £28",
+        "tag": "bouquet",
+        "img": "images/g3.jpg"
+      }
+    ],
+    "maintenance": false,
+    "updatedAt": "2026-07-12T11:52:02.473Z",
+    "contact": {
+      "whatsapp": "447930318018",
+      "phone": "01992479794"
+    },
+    "data": {
+      "hero": {
+        "eyebrow": "Hoddesdon · Est. family florist",
+        "heading": "Beautiful flowers, lovingly made.",
+        "lede": "Fresh, hand-tied arrangements for every occasion — from weddings and celebrations to funeral tributes — crafted by Louise with over 40 years' experience, right in the heart of Hoddesdon.",
+        "img": "images/hero.jpg"
+      },
+      "services": [
+        {
+          "id": "s1",
+          "title": "Weddings",
+          "desc": "Bouquets, buttonholes, arches and venue flowers — planned with you for your perfect day."
+        },
+        {
+          "id": "s2",
+          "title": "Funerals & Tributes",
+          "desc": "Thoughtful, dignified tributes and sympathy flowers, arranged with care and delivered on time."
+        },
+        {
+          "id": "s3",
+          "title": "Occasions & Celebrations",
+          "desc": "Birthdays, anniversaries, new baby or \"just because\" — hand-tied bouquets to make someone smile."
+        },
+        {
+          "id": "s4",
+          "title": "Corporate & Events",
+          "desc": "Regular displays, event flowers and seasonal arrangements for local businesses."
+        }
+      ],
+      "occasions": [
+        {
+          "id": "o1",
+          "icon": "💍",
+          "name": "Weddings"
+        },
+        {
+          "id": "o2",
+          "icon": "🕊️",
+          "name": "Funerals"
+        },
+        {
+          "id": "o3",
+          "icon": "❤️",
+          "name": "Valentine's"
+        },
+        {
+          "id": "o4",
+          "icon": "💐",
+          "name": "Mother's Day"
+        },
+        {
+          "id": "o5",
+          "icon": "🥂",
+          "name": "Anniversaries"
+        }
+      ],
+      "gallery": [
+        {
+          "id": "gal1",
+          "caption": "Hand-tied bouquets",
+          "img": "images/g1.jpg"
+        },
+        {
+          "id": "gal2",
+          "caption": "Seasonal blooms",
+          "img": "images/g2.jpg"
+        },
+        {
+          "id": "gal3",
+          "caption": "Bright & cheerful",
+          "img": "images/g3.jpg"
+        },
+        {
+          "id": "gal4",
+          "caption": "Wedding flowers",
+          "img": "images/g4.jpg"
+        },
+        {
+          "id": "gal5",
+          "caption": "Sympathy tributes",
+          "img": "https://res.cloudinary.com/kmumdrn6/image/upload/v1783819010/louises-florist/iatxo7bugfwvtpr8scw4.jpg"
+        },
+        {
+          "id": "gal6",
+          "caption": "Beautiful bouquets",
+          "img": "images/g6.jpg"
+        }
+      ],
+      "boxes": [
+        {
+          "id": "b1",
+          "title": "Hand-tied Bouquet",
+          "desc": "A beautiful seasonal mix, hand-tied and beautifully wrapped.",
+          "price": "from £27",
+          "tag": "seasonal",
+          "img": "images/g1.jpg"
+        },
+        {
+          "id": "b2",
+          "title": "Luxury Bouquet",
+          "desc": "A generous, statement arrangement of premium blooms.",
+          "price": "from £45",
+          "tag": "deluxe",
+          "img": "images/g4.jpg"
+        },
+        {
+          "id": "b3",
+          "title": "A Dozen Roses",
+          "desc": "Classic and romantic — a dozen fresh roses, beautifully tied.",
+          "price": "from £35",
+          "tag": "roses",
+          "img": "images/g6.jpg"
+        },
+        {
+          "id": "b4",
+          "title": "Seasonal Blooms",
+          "desc": "Whatever's freshest that week, arranged with a keen eye.",
+          "price": "from £30",
+          "tag": "seasonal",
+          "img": "images/g2.jpg"
+        },
+        {
+          "id": "b5",
+          "title": "Sympathy Tribute",
+          "desc": "Dignified funeral tributes and sympathy flowers, made with care.",
+          "price": "from £40",
+          "tag": "tribute",
+          "img": "images/g5.jpg"
+        },
+        {
+          "id": "b6",
+          "title": "Bright & Cheerful",
+          "desc": "A vibrant, happy bunch to brighten anyone's day.",
+          "price": "from £28",
+          "tag": "bouquet",
+          "img": "images/g3.jpg"
+        }
+      ],
+      "contact": {
+        "name": "Louise's Florist",
+        "address": "53 High Street, Hoddesdon, EN11 8TQ",
+        "phone": "01992 479 794",
+        "whatsapp": "447930318018",
+        "email": "hello@louisesflorist.co.uk",
+        "facebook": "https://www.facebook.com/Louisesfloristhoddesdon/",
+        "hours": [
+          {
+            "day": "Mon – Fri",
+            "time": "9:00 – 5:00"
+          },
+          {
+            "day": "Saturday",
+            "time": "9:00 – 4:00"
+          },
+          {
+            "day": "Sunday",
+            "time": "Closed"
+          }
+        ]
+      },
+      "social": [
+        {
+          "id": "facebook",
+          "name": "Facebook",
+          "url": "https://www.facebook.com/Louisesfloristhoddesdon/",
+          "enabled": true
+        },
+        {
+          "id": "instagram",
+          "name": "Instagram",
+          "url": "",
+          "enabled": false
+        },
+        {
+          "id": "tiktok",
+          "name": "TikTok",
+          "url": "",
+          "enabled": false
+        },
+        {
+          "id": "pinterest",
+          "name": "Pinterest",
+          "url": "",
+          "enabled": false
+        },
+        {
+          "id": "youtube",
+          "name": "YouTube",
+          "url": "",
+          "enabled": false
+        },
+        {
+          "id": "x",
+          "name": "X (Twitter)",
+          "url": "",
+          "enabled": false
+        },
+        {
+          "id": "whatsapp",
+          "name": "WhatsApp",
+          "url": "",
+          "enabled": false
+        },
+        {
+          "id": "linkedin",
+          "name": "LinkedIn",
+          "url": "",
+          "enabled": false
+        }
+      ],
+      "maintenance": false
+    }
+  }
+]
