@@ -261,6 +261,20 @@ app.post("/api/admin/upload", requireAuth, upload.single("file"), async (req, re
   }
 });
 
+// Admin: list previously-uploaded photos (the reusable library).
+app.get("/api/admin/media", requireAuth, async (req, res) => {
+  if (!cloudinaryReady) return res.status(503).json({ error: "Image uploads aren't configured yet" });
+  try {
+    const result = await cloudinary.api.resources({ type: "upload", prefix: "louises-florist/", max_results: 200 });
+    const images = (result.resources || [])
+      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+      .map((r) => ({ url: r.secure_url, id: r.public_id }));
+    res.json({ images });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 /* ===================== ADMIN PAGE ===================== */
 app.get("/admin", (req, res) => {
   res.sendFile(path.join(__dirname, "views", isAdmin(req) ? "admin.html" : "login.html"));
