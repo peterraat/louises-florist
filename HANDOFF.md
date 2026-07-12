@@ -74,6 +74,27 @@ FB /Louisesfloristhoddesdon.
 - Maintenance middleware serves the holding page to visitors when `maintenance` is on, but exempts
   the holding image and the logo badge.
 
+## Automatic GitHub → GitLab backup (mirror)
+
+Every push to GitHub auto-copies the whole repo to a **GitLab** backup, via
+`.github/workflows/mirror.yml`. This is free (GitHub Actions + GitLab free tier).
+
+- Backup repo: `https://gitlab.com/lifeswonderful/louises-florist-backup` (private)
+- Auth: a GitLab **personal access token** (`write_repository` scope, ~1yr expiry, named
+  `github-mirror`) stored as a GitHub Actions secret named **`GITLAB_TOKEN`**.
+- ⚠️ The GitLab token expires **2027-07-12** — regenerate it before then and update the
+  `GITLAB_TOKEN` secret, or backups silently stop.
+- One-time gotcha (already fixed): GitLab protects `main` against force-push by default, which
+  blocked the mirror. Fixed by turning **Settings → Repository → Protected branches → main →
+  "Allowed to force push"** ON.
+
+### To add this backup to a NEW client site (reusable pattern)
+1. Create an empty (no README) private GitLab repo for the site.
+2. Turn on "Allowed to force push" for its `main` branch (Settings → Repository → Protected branches).
+3. Copy `.github/workflows/mirror.yml` into the new repo; change the GitLab URL to the new repo.
+4. Add the same `GITLAB_TOKEN` secret to the new GitHub repo (the one token works for all your
+   repos since it's a legacy/all-projects token). Push — it mirrors automatically.
+
 ## Environment variables (set on Render, see `.env.example`)
 
 `MONGODB_URI` · `ADMIN_PASSWORD` · `JWT_SECRET` (cookie signing) · `TOTP_SECRET` ·
