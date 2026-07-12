@@ -1,0 +1,56 @@
+name: Daily database backup
+
+# Dumps the MongoDB content to backups/ once a day and commits it (git history =
+# the backup history). Also pushes straight to the GitLab backup, so each snapshot
+# lands on both hosts. Free: runs on GitHub Actions in a few seconds.
+#
+# Reusable template: copy into any site's repo, add its MONGODB_URI + GITLAB_TOKEN
+# secrets, and change the GitLab URL in the last step.
+
+on:
+  schedule:
+    - cron: "17 3 * * *"     # 03:17 UTC every day
+  workflow_dispatch:          # lets you run a backup on demand from the Actions tab
+  push:
+    paths:
+      - '.github/workflows/backup.yml'   # TEMPORARY: for first-run testing; remove after it works
+
+permissions:
+  contents: write             # allow the workflow to commit the snapshot back
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - run: npm ci
+
+      - name: Dump database to backups/
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+        run: node scripts/backup-db.mjs
+
+      - name: Commit + push snapshot if it changed
+        env:
+          GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
+        run: |
+          git config user.name "backup-bot"
+          git config user.email "backup-bot@users.noreply.github.com"
+          git add backups
+          if git diff --cached --quiet; then
+            echo "No content changes since the last backup — nothing to commit."
+            exit 0
+          fi
+          git commit -m "Automated DB backup $(date -u +%Y-%m-%d)"
+          git push origin HEAD:main
+          # Push straight to GitLab too. (Commits pushed with GITHUB_TOKEN don't
+          # trigger the mirror workflow, so we mirror this snapshot explicitly.)
+          TOKEN="$(printf '%s' "$GITLAB_TOKEN" | tr -d '[:space:]')"
+          git push --force "https://oauth2:${TOKEN}@gitlab.com/lifeswonderful/louises-florist-backup.git" HEAD:refs/heads/main
