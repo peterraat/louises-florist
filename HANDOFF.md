@@ -1,14 +1,30 @@
 # Handoff / Worklog — Louise's Florist
 
-Working notes, kept in git so they auto-push to GitHub and nothing is lost if VS Code crashes.
+Working notes, kept in git so they auto-push to GitHub (and mirror to GitLab) — nothing is lost if
+VS Code crashes or Peter moves to a new PC.
 
-Repo: `github.com/peterraat/louises-florist`
+Repo: `github.com/peterraat/louises-florist` · Owner email: peter.raat@gmail.com
 Host: **Render** (Node web service, Starter tier ≈ $7/mo, always-on)
-Data: **MongoDB Atlas** (free tier) · Images: **Cloudinary** (free tier)
+Data: **MongoDB Atlas** (free tier) · Images: **Cloudinary** (free tier) · Email: **MailerSend**
 
-_Last updated: 2026-07-12_
+**Live site:** https://louises-florist.onrender.com · **Admin:** /admin
+**Staging (private workshop):** https://louises-florist-staging.onrender.com
+
+_Last updated: 2026-07-13_
 
 ---
+
+## ▶️ How to resume (new PC / after a crash)
+
+1. Install VS Code + Claude Code CLI; open a terminal, run `claude`.
+2. `git clone https://github.com/peterraat/louises-florist` and open it.
+3. Tell Claude: *"Read HANDOFF.md and continue."* This file is the full state.
+4. **Active work is on the `staging` branch** (`git checkout staging`). Finished features that
+   aren't live yet sit there until "promoted". See **Current position** at the bottom.
+
+Workflow reminder: we build on `staging` → review at the staging URL → **promote** (merge
+`staging → main`) → Render auto-deploys `main` to the live site. Louise edits her own *content*
+live via the admin (that never needs staging).
 
 ## What this is now
 
@@ -157,10 +173,52 @@ Needs these env vars on Render (form degrades gracefully to "please call the sho
 
 Reusable across sites — this is part of the template engine.
 
-## Still to do
+## Environments & workflow (staging → production)
 
-1. **Add occasions to the admin panel** — they're currently editable inline on the live site only;
-   mirror them in `views/admin.html` too.
-2. **Mobile responsiveness sweep** of the storefront.
-3. Real prices/photos confirmed with Louise; wire the order/enquiry form to actually send.
-4. Optional: custom domain → point DNS at Render + HTTPS.
+- **Production**: Render service `louises-florist`, deploys from **`main`**, database `louisesflorist`.
+  URL: https://louises-florist.onrender.com
+- **Staging**: Render service `louises-florist-staging` (free tier, sleeps when idle), deploys from
+  **`staging`**, its own database `louisesflorist-staging` (isolated — testing never touches live
+  content). URL: https://louises-florist-staging.onrender.com
+- **Promote** = merge `staging → main`; Render redeploys production. Nothing goes live without it.
+- Staging Render env vars mirror production except `MONGODB_URI` ends in `louisesflorist-staging`
+  and `TOTP_SECRET` is omitted (no 2FA prompt on staging).
+
+## Template / reuse (this repo is the blueprint)
+
+- `site.config.js` — per-site identity (brand, `cloudinaryFolder`, theme palette, SEO). Cloudinary
+  folder is now read from here (not hardcoded).
+- `TEMPLATE.md` — full "new site = rebrand" checklist. The plan: mark this repo as a GitHub template;
+  each new client (gift shop, café…) is a copy + rebrand, inheriting the whole engine + backups.
+- The palette lives in a `🎨 THEME` block at the top of `public/index.html`'s `<style>`.
+
+## Business context / decisions (for continuity)
+
+- Goal: Peter is scaling this into a business (many client sites; aspiration ~1000 in 5 yrs).
+- **Louise's is a free showpiece** — Peter is not charging her; it's the portfolio flagship.
+- Conventions adopted: 3-2-1 backups; one database per site; config in env vars; 2FA; per-site
+  GitHub repo + GitLab mirror + daily DB backup. Next conventions to consider: template repo,
+  monitoring (UptimeRobot), a password manager, and — the big scaling issue — **hosting economics**
+  (1 Render service/site at ~$7/mo doesn't scale to 1000; eventually multi-tenant or cheaper hosting).
+- Domain: **on hold** — Peter plans to buy `louisesflorist.co.uk` himself (under his GoDaddy),
+  then point web DNS at Render + verify the domain in MailerSend for a branded `ENQUIRY_FROM`.
+
+## Still to do (paused until Peter talks to Louise)
+
+1. **Promote staging → main** — the occasions admin editor + template files (`site.config.js`,
+   `TEMPLATE.md`, theme banner) are finished on `staging`, not yet live.
+2. **Switch on the contact form** — code is done; add the 4 MailerSend env vars on Render
+   (`MAILERSEND_API_KEY`, `ENQUIRY_TO`, `ENQUIRY_FROM`, `ENQUIRY_FROM_NAME`). For now reuse the
+   lifeswonderful.com verified sender; upgrade to a branded address once the domain lands. Then test.
+3. **Mobile responsiveness sweep** of the storefront (do it on staging, then promote).
+4. **Custom domain** (on hold) → point DNS at Render + HTTPS + branded MailerSend sender.
+5. Real prices/photos — Louise's to fill in via the admin (not blocking).
+
+## Current position (where we left off — 2026-07-13)
+
+- On branch **`staging`**. Everything is committed & pushed (GitHub + GitLab mirror).
+- **Built on staging but NOT promoted to live:** occasions admin editor, `site.config.js`,
+  `TEMPLATE.md`, the theme banner, Cloudinary-folder-from-config.
+- **Built (on both branches) but NOT switched on:** the MailerSend contact form (needs Render env vars).
+- Work is **paused** — Peter is talking to Louise before finishing. Next session: promote the
+  staging work, wire the contact form, do the mobile sweep. Then it's launch-ready (domain optional).
