@@ -163,6 +163,38 @@ authenticator.options = { window: 1 };
 const TOTP_SECRET = (process.env.TOTP_SECRET || "").trim();
 const TOTP_ENABLED = TOTP_SECRET.length >= 16;
 
+/* ---- 2FA backup codes: one-time recovery codes for a lost authenticator ----
+   Stored as SHA-256 hashes (never plaintext); plaintext shown once at generation.
+   Regenerating wipes the old set so a leaked unused code can't be replayed. */
+const BackupCode = mongoose.model("BackupCode", new mongoose.Schema({
+  codeHash:  { type: String, index: true },
+  used:      { type: Boolean, default: false },
+  createdAt: { type: Date, default: Date.now },
+  usedAt:    Date
+}, { versionKey: false }));
+const BACKUP_CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // no I/L/O/0/1
+function generateBackupCodePlain() {
+  const buf = crypto.randomBytes(8);
+  let s = "";
+  for (let i = 0; i < 8; i++) s += BACKUP_CODE_ALPHABET[buf[i] % BACKUP_CODE_ALPHABET.length];
+  return s.slice(0, 4) + "-" + s.slice(4, 8);
+}
+function hashBackupCode(plain) {
+  const norm = String(plain || "").replace(/[\s-]/g, "").toUpperCase();
+  return crypto.createHash("sha256").update(norm).digest("hex");
+}
+async function consumeBackupCode(plain) {
+  if (!dbReady) return false;
+  const norm = String(plain || "").replace(/[\s-]/g, "").toUpperCase();
+  if (norm.length < 8) return false;
+  const r = await BackupCode.findOneAndUpdate(
+    { codeHash: hashBackupCode(norm), used: false },
+    { $set: { used: true, usedAt: new Date() } },
+    { new: true }
+  );
+  return !!r;
+}
+
 // Cloudinary — durable image hosting for admin photo uploads.
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -265,7 +297,7 @@ app.post("/api/enquiry", enquiryLimiter, async (req, res) => {
 /* ===================== AUTH ===================== */
 const loginLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 10, standardHeaders: true, legacyHeaders: false, validate: false, message: { error: "Too many attempts — please wait a few minutes." } });
 
-app.post("/api/login", loginLimiter, (req, res) => {
+app.post("/api/login", loginLimiter, async (req, res) => {
   if (!ADMIN_PASSWORD || !AUTH_SECRET) return res.status(503).json({ error: "Admin not configured" });
   const { password, totp, trust } = req.body || {};
   if (!password || !safeEqual(password, ADMIN_PASSWORD)) return res.status(401).json({ error: "Invalid password" });
@@ -273,6 +305,10 @@ app.post("/api/login", loginLimiter, (req, res) => {
     const code = String(totp || "").replace(/\s+/g, "");
     let ok = false;
     try { ok = code.length === 6 && authenticator.check(code, TOTP_SECRET); } catch (_) { ok = false; }
+    // Backup-code fallback: a TOTP is 6 digits; anything else ≥8 chars is tried as a backup code.
+    if (!ok && code.replace(/-/g, "").length >= 8) {
+      try { ok = await consumeBackupCode(code); } catch (_) { ok = false; }
+    }
     if (!ok) return res.status(401).json({ error: "Invalid authenticator code", totp: true });
   }
   const ttl = trust ? 30 * 24 * 60 * 60 * 1000 : 8 * 60 * 60 * 1000; // 30 days if trusted, else 8h
@@ -285,6 +321,26 @@ app.get("/api/admin/totp-qr", requireAuth, async (req, res) => {
   if (!TOTP_ENABLED) return res.json({ enabled: false });
   const uri = authenticator.keyuri("admin", "LouisesFlorist", TOTP_SECRET);
   res.json({ enabled: true, qr: await QRCode.toDataURL(uri).catch(() => null) });
+});
+
+// Backup codes: generate a fresh set of 10 (wipes old), or report how many remain.
+app.post("/api/admin/backup-codes/generate", requireAuth, async (req, res) => {
+  if (!TOTP_ENABLED) return res.status(400).json({ error: "Turn on 2FA before generating backup codes." });
+  if (!dbReady) return res.status(503).json({ error: "Database not connected" });
+  try {
+    const codes = Array.from({ length: 10 }, generateBackupCodePlain);
+    await BackupCode.deleteMany({});
+    await BackupCode.insertMany(codes.map((c) => ({ codeHash: hashBackupCode(c), used: false })));
+    res.json({ codes });   // plaintext returned exactly once
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+app.get("/api/admin/backup-codes/status", requireAuth, async (req, res) => {
+  if (!dbReady) return res.json({ total: 0, remaining: 0 });
+  try {
+    const total = await BackupCode.countDocuments({});
+    const remaining = await BackupCode.countDocuments({ used: false });
+    res.json({ total, remaining });
+  } catch (_) { res.json({ total: 0, remaining: 0 }); }
 });
 
 /* ===================== ADMIN API ===================== */

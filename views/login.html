@@ -45,7 +45,7 @@
     <input type="password" id="pw" autocomplete="current-password" autofocus />
     <div id="totp-wrap" style="display:none">
       <label for="totp" style="margin-top:14px;">Authenticator code</label>
-      <input id="totp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="6-digit code" />
+      <input id="totp" autocomplete="one-time-code" maxlength="20" placeholder="6-digit code (or backup code)" />
     </div>
     <label class="trust"><input type="checkbox" id="trust" /> Trust this browser (stay signed in for 30 days)</label>
     <button type="submit" id="btn">Sign in</button>
