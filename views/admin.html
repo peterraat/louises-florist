@@ -176,6 +176,19 @@
       <div id="social"></div>
     </div>
 
+    <h2>Security — 2FA backup codes</h2>
+    <div class="card">
+      <p class="note" style="margin:0 0 12px">One-time codes to log in if you ever lose your authenticator phone. <b>Print them or keep them somewhere safe.</b> Each works once. Generating new ones cancels the old set.</p>
+      <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+        <button class="save" id="gen-backup" type="button">Generate backup codes</button>
+        <span id="backup-status" style="font-size:13px;font-weight:600;color:var(--ink-soft)"></span>
+      </div>
+      <div id="backup-codes" style="display:none;margin-top:14px">
+        <div style="font-size:12px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">⚠ Shown once — save these now</div>
+        <div id="backup-list" style="display:grid;grid-template-columns:repeat(2,max-content);gap:8px 28px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:16px;font-weight:700;letter-spacing:.04em;color:var(--ink)"></div>
+      </div>
+    </div>
+
     <div class="bar">
       <span class="status" id="status"></span>
       <span class="sp"></span>
@@ -332,6 +345,7 @@
     wireUploads();
     document.querySelectorAll('input,textarea').forEach(i=>i.addEventListener('input',()=>flash('')));
     maintEl.addEventListener('change',()=>document.body.classList.toggle('maint-on', maintEl.checked));
+    loadBackupStatus();
   }
 
   function collectList(root, sel, fields){
@@ -369,6 +383,24 @@
     finally{ saveBtn.disabled=false; saveBtn.textContent=t; }
   });
   $('logout').addEventListener('click', async ()=>{ await fetch('/api/logout',{method:'POST'}); location.href='/admin'; });
+
+  // 2FA backup codes
+  async function loadBackupStatus(){
+    try{ const r=await fetch('/api/admin/backup-codes/status'); if(!r.ok) return; const d=await r.json();
+      $('backup-status').textContent = d.total ? (d.remaining+' of '+d.total+' codes remaining') : 'No backup codes yet.';
+    }catch(_){}
+  }
+  $('gen-backup').addEventListener('click', async ()=>{
+    if(!confirm('Generate a new set of 10 backup codes? Any existing codes will stop working.')) return;
+    const btn=$('gen-backup'), t=btn.textContent; btn.disabled=true; btn.textContent='Generating…';
+    try{ const r=await fetch('/api/admin/backup-codes/generate',{method:'POST'});
+      if(r.status===401){ location.href='/admin'; return; }
+      const d=await r.json();
+      if(r.ok && d.codes){ $('backup-list').innerHTML=d.codes.map(c=>'<span>'+esc(c)+'</span>').join(''); $('backup-codes').style.display='block'; loadBackupStatus(); }
+      else alert(d.error||'Could not generate codes.');
+    }catch(_){ alert('Something went wrong.'); }
+    finally{ btn.disabled=false; btn.textContent=t; }
+  });
   load();
 </script>
 </body>
