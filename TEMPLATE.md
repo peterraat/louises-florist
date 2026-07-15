@@ -7,16 +7,26 @@ café, barber…). A new site is a **rebrand**, not a rebuild. Here's the full c
 - On GitHub: **Use this template → Create a new repository** (e.g. `daisy-gift-shop`).
 - Clone it locally.
 
-## 2. Change the identity (the ~6 things that differ per site)
+## 2. Change the identity
+
+### Just edit `site.config.js` — this now drives the pages automatically
+The server injects these into every page at request time (via `{{TOKENS}}`), so you **don't touch
+the HTML** for any of them:
+- `brand` — shop name (e.g. "Daisy's Gifts"). Shown in the header, footer, admin, login, copyright.
+- `accentWord` — the word shown in the accent colour (the last word of `brand`, e.g. "Gifts").
+- `tagline` — short strapline.
+- `seo.title` / `seo.description` — the page `<title>` and meta description.
+- `cloudinaryFolder` — keep unique per site (where this site's photos live).
+
+### Still manual per site (can't be a text token)
 | What | Where |
 |---|---|
-| **Brand name, tagline, SEO** | `site.config.js` |
-| **Cloudinary folder** (keep unique per site) | `site.config.js` → `cloudinaryFolder` |
-| **Theme colours** | `public/index.html` → the `🎨 THEME` block at the top of `<style>` (mirror the values into `site.config.js` `theme`) |
-| **Logo / badge images** | `public/images/…-logo-badge.png` (+ favicon references) |
-| **Default text & sections** | `server.js` → `DEFAULT_CONTENT` (hero, services, occasions, gallery, boxes, contact) |
-| **Page `<title>` / meta** | `public/index.html` `<head>` |
-| **Holding page image** | `public/images/wonderful_01.jpg` + `views/maintenance.html` |
+| **Logo / badge image** | replace `public/images/…-logo-badge.png` (+ the maintenance/holding image) |
+| **Theme colours** | `public/index.html` → the `🎨 THEME` block at the top of `<style>` (also mirror into `site.config.js` `theme`) |
+| **Default text & sections** | `server.js` → `DEFAULT_CONTENT` (or just edit it live in `/admin` once deployed) |
+
+That's it — brand/title/tagline come from one file; logo + colours + starter content are the only
+hands-on bits.
 
 ## 3. Give it its own database
 - In the `MONGODB_URI`, set the database name to the new site's slug (e.g. `/daisygiftshop`).
