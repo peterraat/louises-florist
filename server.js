@@ -7,6 +7,7 @@ import mongoose from "mongoose";
 import { authenticator } from "otplib";
 import QRCode from "qrcode";
 import rateLimit from "express-rate-limit";
+import helmet from "helmet";
 import { v2 as cloudinary } from "cloudinary";
 import multer from "multer";
 
@@ -16,6 +17,30 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express();
 app.set("trust proxy", 1);
+
+// Security headers (helmet). CSP tuned to exactly what the site loads:
+// Google Fonts, Cloudinary images, a Google Maps iframe, inline styles+scripts
+// (incl. onerror= image fallbacks). Anything not listed is blocked.
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"],                       // inline <script> blocks
+      scriptSrcAttr: ["'unsafe-inline'"],                            // inline onerror= image fallbacks
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      imgSrc: ["'self'", "data:", "https:"],                         // Cloudinary + any https image
+      connectSrc: ["'self'"],
+      frameSrc: ["https://www.google.com"],                          // the "visit the shop" map embed
+      formAction: ["'self'"],
+      objectSrc: ["'none'"],
+      baseUri: ["'self'"],
+      upgradeInsecureRequests: []
+    }
+  },
+  crossOriginEmbedderPolicy: false   // don't block cross-origin images/embeds
+}));
+
 app.use(express.json());
 
 /* =====================================================================
