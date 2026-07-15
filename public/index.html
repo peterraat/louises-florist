@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Louise's Florist · Hoddesdon — Beautiful flowers for every occasion</title>
+<title>{{SEO_TITLE}}</title>
 <link rel="icon" type="image/png" href="images/louises-florist-logo-badge.png">
 <link rel="apple-touch-icon" href="images/louises-florist-logo-badge.png">
-<meta name="description" content="Louise's Florist, 53 High Street, Hoddesdon. A family florist with over 40 years' experience — weddings, funerals, occasions & celebrations, with fresh cut flowers daily and local delivery.">
+<meta name="description" content="{{SEO_DESC}}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -238,6 +238,7 @@
 
   footer{background:var(--ink);color:#a6c3c5;text-align:center;padding:40px 24px;font-size:13px}
   footer .brand{color:#fff;font-size:23px;font-family:'Montserrat',sans-serif;font-weight:800;letter-spacing:-.02em}
+  footer .brand .r{color:var(--gold)}
   footer a{color:var(--gold)}
   .social-bar{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin:6px 0 20px}
   .social-bar a{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.09);color:#fff;transition:background .2s,transform .2s}
@@ -250,10 +251,10 @@
 
 <nav>
   <div class="nav-in">
-    <a href="#" class="brand-wrap" aria-label="Louise's Florist">
-      <img class="brand-badge" src="images/louises-florist-logo-badge.png" alt="Louise's Florist" onerror="this.remove()">
+    <a href="#" class="brand-wrap" aria-label="{{BRAND}}">
+      <img class="brand-badge" src="images/louises-florist-logo-badge.png" alt="{{BRAND}}" onerror="this.remove()">
       <span class="brand-txt">
-        <span class="brand-name">Louise's <span class="r">Florist</span></span>
+        <span class="brand-name">{{BRAND_HTML}}</span>
         <span class="brand-sub">Fresh Cut Flowers Daily</span>
       </span>
     </a>
@@ -500,10 +501,10 @@
 </section>
 
 <footer>
-  <div class="brand">Louise's <span style="color:var(--gold)">Florist</span></div>
+  <div class="brand">{{BRAND_HTML}}</div>
   <nav class="social-bar" id="socialBar" aria-label="Follow us"></nav>
   <p style="margin:10px 0">53 High Street, Hoddesdon, EN11 8TQ &nbsp;·&nbsp; <a href="tel:01992479794">01992 479794</a></p>
-  <p style="opacity:.6;font-size:12px">© Louise's Florist, Hoddesdon.</p>
+  <p style="opacity:.6;font-size:12px">© {{BRAND}}, Hoddesdon.</p>
 </footer>
 
 <div class="lightbox" id="lightbox" aria-hidden="true">

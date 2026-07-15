@@ -1,4 +1,5 @@
 import path from "path";
+import fs from "fs";
 import crypto from "crypto";
 import { fileURLToPath } from "url";
 
@@ -14,6 +15,32 @@ import multer from "multer";
 import siteConfig from "./site.config.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+/* ---- Template rendering: inject site.config.js identity into the HTML pages ----
+   Pages use {{TOKENS}} for anything that changes per site, so rebranding a copy
+   is "edit site.config.js" — no HTML editing. Rendered fresh each request. */
+function brandHtml() {
+  const { brand = "", accentWord = "" } = siteConfig;
+  if (accentWord && brand.endsWith(accentWord)) {
+    return `${brand.slice(0, brand.length - accentWord.length).trim()} <span class="r">${accentWord}</span>`;
+  }
+  return brand;
+}
+function renderPage(relPath) {
+  let html = fs.readFileSync(path.join(__dirname, relPath), "utf8");
+  const map = {
+    "{{SEO_TITLE}}": (siteConfig.seo && siteConfig.seo.title) || siteConfig.brand || "",
+    "{{SEO_DESC}}":  (siteConfig.seo && siteConfig.seo.description) || "",
+    "{{BRAND}}":     siteConfig.brand || "",
+    "{{BRAND_HTML}}": brandHtml(),
+    "{{TAGLINE}}":   siteConfig.tagline || ""
+  };
+  for (const [k, v] of Object.entries(map)) html = html.split(k).join(v);
+  return html;
+}
+function sendPage(res, relPath, status) {
+  res.status(status || 200).type("html").send(renderPage(relPath));
+}
 
 const app = express();
 app.set("trust proxy", 1);
@@ -463,7 +490,7 @@ app.post("/api/admin/media/delete", requireAuth, async (req, res) => {
 
 /* ===================== ADMIN PAGE ===================== */
 app.get("/admin", (req, res) => {
-  res.sendFile(path.join(__dirname, "views", isAdmin(req) ? "admin.html" : "login.html"));
+  sendPage(res, path.join("views", isAdmin(req) ? "admin.html" : "login.html"));
 });
 
 /* ===================== MAINTENANCE GATE ===================== */
@@ -474,10 +501,13 @@ app.use((req, res, next) => {
   if (!content.maintenance || isAdmin(req)) return next();
   // let the holding page image + the admin/login logo through the gate
   if (req.path === "/images/wonderful_01.jpg" || req.path === "/images/louises-florist-logo-badge.png") return next();
-  res.status(503).sendFile(path.join(__dirname, "views", "maintenance.html"));
+  sendPage(res, path.join("views", "maintenance.html"), 503);
 });
 
 /* ===================== STATIC SITE ===================== */
+// Home page is rendered through the template layer (config-driven identity);
+// everything else (CSS, images, JS) is served statically.
+app.get(["/", "/index.html"], (req, res) => sendPage(res, path.join("public", "index.html")));
 app.use(express.static(path.join(__dirname, "public")));
 
 const PORT = process.env.PORT || 3000;

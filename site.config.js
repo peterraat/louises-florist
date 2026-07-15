@@ -22,9 +22,9 @@ export default {
     ink:    "#26383c"    // text
   },
 
-  // SEO (used for the page <title> / meta description)
+  // SEO — rendered into the page <title> and meta description via {{SEO_TITLE}}/{{SEO_DESC}}
   seo: {
-    title: "Louise's Florist · Hoddesdon",
-    description: "Fresh, hand-tied flowers for every occasion — weddings, funerals and celebrations — from Louise's Florist in Hoddesdon."
+    title: "Louise's Florist · Hoddesdon — Beautiful flowers for every occasion",
+    description: "Louise's Florist, 53 High Street, Hoddesdon. A family florist with over 40 years' experience — weddings, funerals, occasions & celebrations, with fresh cut flowers daily and local delivery."
   }
 };
