@@ -1,7 +1,8 @@
 {
   "database": "louisesflorist",
   "collections": [
-    "contents"
+    "contents",
+    "backupcodes"
   ],
   "documentCount": 1,
   "skippedOversized": [],
