@@ -52,7 +52,7 @@
       }
     ],
     "maintenance": false,
-    "updatedAt": "2026-07-15T20:38:19.803Z",
+    "updatedAt": "2026-07-16T07:32:31.118Z",
     "contact": {
       "whatsapp": "447930318018",
       "phone": "01992479794"
@@ -267,7 +267,7 @@
           "enabled": false
         }
       ],
-      "maintenance": true
+      "maintenance": false
     }
   }
 ]
