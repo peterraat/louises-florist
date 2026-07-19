@@ -52,7 +52,7 @@
       }
     ],
     "maintenance": false,
-    "updatedAt": "2026-07-17T05:57:51.741Z",
+    "updatedAt": "2026-07-18T13:40:05.631Z",
     "contact": {
       "whatsapp": "447930318018",
       "phone": "01992479794"
@@ -137,7 +137,7 @@
         {
           "id": "gal5",
           "caption": "Sympathy tributes",
-          "img": "https://res.cloudinary.com/kmumdrn6/image/upload/v1783819010/louises-florist/iatxo7bugfwvtpr8scw4.jpg"
+          "img": "https://res.cloudinary.com/kmumdrn6/image/upload/v1784360008/louises-florist/xulvmgnhhxt3qekd18vx.jpg"
         },
         {
           "id": "gal6",
@@ -267,7 +267,7 @@
           "enabled": false
         }
       ],
-      "maintenance": false
+      "maintenance": true
     }
   }
 ]
